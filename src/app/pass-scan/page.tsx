@@ -65,7 +65,7 @@ const handleCheckIn = async () => {
     const token = localStorage.getItem("token");
 
     try {
-        const response = await apiRequest<{ message: string }>(
+         await apiRequest<{ message: string }>(
             `/api/bookings/check-in/${passData?._id}`,
             "PUT",
             { checkPassCount: checkPassCount },

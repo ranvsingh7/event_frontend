@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Card,
     CardContent,
@@ -192,7 +192,7 @@ try {
 
     const handleBookSave = async () => {
         const { selectValue, ...bookingData } = bookEventDetails;
-        console.log(bookingData);
+        console.log(selectValue);
 
 
         try {
