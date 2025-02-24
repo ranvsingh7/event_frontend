@@ -50,7 +50,10 @@ const CreateEvent = () => {
     
         try {
             // Retrieve the token from localStorage (or another secure location)
-            const token = localStorage.getItem("token");
+            const token = document.cookie.replace(
+                /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+                "$1"
+            );
             if (!token) {
                 throw new Error("You must be logged in to create an event.");
             }

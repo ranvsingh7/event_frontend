@@ -26,7 +26,10 @@ const PassScan = () => {
   const fetchPassData = async (passId: string) => {
     setLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = document.cookie.replace(
+      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+      "$1"
+  );
 
     try {
       const response = await apiRequest<PassData>(`/api/bookings/pass/${passId}`, "GET",undefined, token||"");

@@ -34,7 +34,9 @@ export default function Signin() {
             const result = await apiRequest<{ message: string; token: string }>("/api/auth/signin", "POST", formData);
             setSuccess(result.message);
             // Optionally, redirect user or store token in localStorage
-            localStorage.setItem("token", result.token);
+            // localStorage.setItem("token", result.token);
+            // set token in cookies
+            document.cookie = `token=${result.token}; path=/;`;
             window.location.href = "/"; // Redirect to homepage
         } catch (err: any) {
             setError(err.message);
