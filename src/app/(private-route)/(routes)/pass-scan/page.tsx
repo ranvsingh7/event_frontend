@@ -148,7 +148,7 @@ const handleCheckIn = async () => {
         </>
 
       ) : scanPass ? (
-        <div className="w-[400px] h-[400px]">
+        <div className="w-[400px] h-[400px] relative">
             <Scanner onScan={(result) =>{handleResult(result)}} />
         </div>
       ) : <Button onClick={()=>setScanPass(true)}>Scan Pass</Button>}

@@ -2,7 +2,8 @@
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import { apiRequest } from "../../utils/api";
-import { TextField, Button, MenuItem, Select, InputLabel, FormControl, SelectChangeEvent } from "@mui/material";
+import { TextField, Button, MenuItem, Select, InputLabel, FormControl, SelectChangeEvent, Typography } from "@mui/material";
+import toast from "react-hot-toast";
 
 interface FormData {
     name: string;
@@ -22,8 +23,6 @@ export default function Signup() {
         username: "",
         userType: "user",
     });
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
 
     // handleChange to accept both input and select changes
     const handleChange = (
@@ -35,12 +34,11 @@ export default function Signup() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setError(null);
-        setSuccess(null);
 
         try {
             const result = await apiRequest<{ message: string }>("/api/auth/signup", "POST", formData);
-            setSuccess(result.message);
+            toast.success(result.message);
+            window.location.href = "/signin"; // Redirect to signin page
             // clear form data
             setFormData({
                 name: "",
@@ -51,16 +49,14 @@ export default function Signup() {
                 userType: "user",
             });
         } catch (err: any) {
-            setError(err.message);
+            toast.error(err.message);
         }
     };
 
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4 w-96">
-                <h2 className="text-xl font-bold">Signup</h2>
-                {error && <p className="text-red-500">{error}</p>}
-                {success && <p className="text-green-500">{success}</p>}
+                <h2 className="text-xl font-bold text-center text-slate-700">Signup</h2>
                 
                 <TextField
                     label="Name"
@@ -131,6 +127,10 @@ export default function Signup() {
                 >
                     Sign Up
                 </Button>
+
+                <Typography variant="body2" className="text-center text-slate-700">
+                    Already have an account? <a href="/signin" className="text-blue-500">Sign In</a>
+                </Typography>
             </form>
         </div>
     );

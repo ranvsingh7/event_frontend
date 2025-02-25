@@ -3,6 +3,7 @@
 import {  useState } from "react";
 import { TextField, Button, Typography, Grid, Card, CardContent } from "@mui/material";
 import { apiRequest } from "@/utils/api";
+import toast from "react-hot-toast";
 
 const CreateEvent = () => {
     const [formData, setFormData] = useState({
@@ -14,8 +15,6 @@ const CreateEvent = () => {
     });
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -42,11 +41,9 @@ const CreateEvent = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
-        setSuccess(null);
         setLoading(true);
 
-        console.log(formData);
+        // console.log(formData);
     
         try {
             // Retrieve the token from localStorage (or another secure location)
@@ -65,8 +62,8 @@ const CreateEvent = () => {
                 formData,
                 token
             );
-    
-            setSuccess(response.message);
+            // console.log(response)
+            toast.success(response.message)
             setFormData({
                 name: "",
                 description: "",
@@ -75,7 +72,7 @@ const CreateEvent = () => {
                 entryTypes: [{ name: "", amount: "", count: "" }],
             });
         } catch (err: any) {
-            setError(err.message || "Failed to create event.");
+            toast.error(err.message)
         } finally {
             setLoading(false);
         }
@@ -91,8 +88,6 @@ const CreateEvent = () => {
                         <Typography variant="h5" gutterBottom>
                             Create New Event
                         </Typography>
-                        {error && <Typography color="error">{error}</Typography>}
-                        {success && <Typography color="success.main">{success}</Typography>}
 
                         <form onSubmit={handleSubmit} noValidate>
                             <TextField
@@ -119,7 +114,7 @@ const CreateEvent = () => {
                                 name="date"
                                 value={formData.date}
                                 onChange={handleInputChange}
-                                type="datetime-local"
+                                type="date"
                                 fullWidth
                                 required
                                 margin="normal"
