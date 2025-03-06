@@ -2,7 +2,7 @@
 
 import { PassData } from "@/types/types";
 import { apiRequest } from "@/utils/api";
-import { Add, Remove } from "@mui/icons-material";
+import { Add, QrCodeScannerOutlined, Remove } from "@mui/icons-material";
 import { Button, Card, CardContent, CircularProgress, Dialog, IconButton, TextField, Typography } from "@mui/material";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { useEffect, useState } from "react";
@@ -85,7 +85,7 @@ const handleCheckIn = async () => {
 };
 
     return isClient ? (
-        <div style={{ padding: "20px" }}>
+        <div className="p-5 w-max m-auto flex flex-col items-center">
       <Typography variant="h4" gutterBottom>
         SCAN PASS
       </Typography>
@@ -149,9 +149,13 @@ const handleCheckIn = async () => {
 
       ) : scanPass ? (
         <div className="w-[400px] h-[400px] relative">
+          <div className="border border-red-500 w-full w-[300px] top-[200px] left-[50px] z-10 absolute"></div>
             <Scanner onScan={(result) =>{handleResult(result)}} />
         </div>
-      ) : <Button onClick={()=>setScanPass(true)}>Scan Pass</Button>}
+      ) : <Button onClick={()=>setScanPass(true)} variant="contained">
+        <QrCodeScannerOutlined />
+        Scan Pass
+        </Button>}
 
       {error && (
         <Typography color="error" style={{ marginTop: "20px" }}>

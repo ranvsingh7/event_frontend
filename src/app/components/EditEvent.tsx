@@ -81,11 +81,12 @@ const EditEventDialog: React.FC<EditEventDialogProps> = ({
                     Entry Types
                 </Typography>
                 {editEvent?.entryTypes.map((entryType, index) => (
-                    <Grid container spacing={2} alignItems="center" key={index}>
+                    <Grid container spacing={2} alignItems="center" style={{marginTop: "4px"}} key={index}>
                         <Grid item xs={4}>
                             <TextField
                                 label="Name"
                                 fullWidth
+                                size="small"
                                 value={entryType.name}
                                 onChange={(e) =>
                                     onEntryTypeChange(index, "name", e.target.value)
@@ -96,6 +97,7 @@ const EditEventDialog: React.FC<EditEventDialogProps> = ({
                             <TextField
                                 label="Amount"
                                 type="number"
+                                size="small"
                                 fullWidth
                                 value={entryType.amount}
                                 onChange={(e) =>
@@ -107,6 +109,7 @@ const EditEventDialog: React.FC<EditEventDialogProps> = ({
                             <TextField
                                 label="Count"
                                 type="number"
+                                size="small"
                                 fullWidth
                                 value={entryType.count}
                                 onChange={(e) =>
@@ -117,6 +120,7 @@ const EditEventDialog: React.FC<EditEventDialogProps> = ({
                         <Grid item xs={2}>
                             <IconButton
                                 color="error"
+                                size="small"
                                 onClick={() => removeEntryType(index)}
                             >
                                 <Remove />

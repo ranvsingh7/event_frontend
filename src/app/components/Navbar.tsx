@@ -18,7 +18,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex items-center justify-between p-4 h-max text-[#f96982] shadow-md sticky top-0 z-10 bg-white">
+    <nav className={`flex items-center justify-between p-4 h-max text-[#f96982] shadow-md sticky top-0 z-10 bg-white ${!isMenuOpen && "overflow-hidden"}`}>
       <div className="flex gap-20">
         {/* Left Section: Logo */}
 

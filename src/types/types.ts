@@ -40,6 +40,9 @@ export interface BookEventDetails {
 export interface Booking extends BookEventDetails {
     _id: string;
     date: string;
+    entryTitle: string;
+    eventDate: string;
+    createdAt: string
 }
 
 export interface PassData {

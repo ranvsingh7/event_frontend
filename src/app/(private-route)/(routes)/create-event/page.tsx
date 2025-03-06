@@ -1,9 +1,11 @@
 "use client";
 
 import {  useState } from "react";
-import { TextField, Button, Typography, Grid, Card, CardContent } from "@mui/material";
+import { TextField, Button, Typography, Grid, Card, CardContent, IconButton } from "@mui/material";
 import { apiRequest } from "@/utils/api";
 import toast from "react-hot-toast";
+import { Add, Remove } from "@mui/icons-material";
+import Pass from "@/app/components/Pass";
 
 const CreateEvent = () => {
     const [formData, setFormData] = useState({
@@ -15,6 +17,7 @@ const CreateEvent = () => {
     });
 
     const [loading, setLoading] = useState(false);
+    const [demoPassOpen, setDemoPassOpen] = useState(false)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -35,6 +38,9 @@ const CreateEvent = () => {
     };
 
     const removeEntryType = (index: number) => {
+        if(formData.entryTypes.length === 1){
+            return
+        }
         const updatedEntryTypes = formData.entryTypes.filter((_, i) => i !== index);
         setFormData((prev) => ({ ...prev, entryTypes: updatedEntryTypes }));
     };
@@ -81,13 +87,18 @@ const CreateEvent = () => {
     
 
     return (
-        <Grid container justifyContent="center" alignItems="center" style={{ minHeight: "100vh" }}>
+        <Grid container justifyContent="center" alignItems="center" style={{ minHeight: "100vh", width: "100%" }}>
             <Grid item xs={12} sm={8} md={6}>
                 <Card>
                     <CardContent>
                         <Typography variant="h5" gutterBottom>
                             Create New Event
                         </Typography>
+                        <Button onClick={()=>setDemoPassOpen(true)}>Show Demo Pass</Button>
+                        <Pass open={demoPassOpen} dialogClose={()=>{setDemoPassOpen(false)}} passData={{
+                            eventName: formData.name,
+                            eventDesc: formData.description
+                        }} demoPass />
 
                         <form onSubmit={handleSubmit} noValidate>
                             <TextField
@@ -130,64 +141,64 @@ const CreateEvent = () => {
                                 margin="normal"
                             />
 
-                            <Typography variant="h6" gutterBottom>
-                                Entry Types
-                            </Typography>
-                            {formData.entryTypes.map((entryType, index) => (
-                                <Grid container spacing={2} key={index}>
-                                    <Grid item xs={4}>
-                                        <TextField
-                                            label="Name"
-                                            value={entryType.name}
-                                            onChange={(e) =>
-                                                handleEntryTypeChange(index, "name", e.target.value)
-                                            }
-                                            fullWidth
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <TextField
-                                            label="Amount"
-                                            type="number"
-                                            value={entryType.amount}
-                                            onChange={(e) =>
-                                                handleEntryTypeChange(index, "amount", e.target.value)
-                                            }
-                                            fullWidth
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={3}>
-                                        <TextField
-                                            label="Count"
-                                            type="number"
-                                            value={entryType.count}
-                                            onChange={(e) =>
-                                                handleEntryTypeChange(index, "count", e.target.value)
-                                            }
-                                            fullWidth
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={1}>
-                                        <Button
-                                            color="error"
-                                            onClick={() => removeEntryType(index)}
-                                            disabled={formData.entryTypes.length === 1}
-                                        >
-                                            Remove
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            ))}
+                            <Typography variant="h6" sx={{ mt: 2 }}>
+                                                Entry Types
+                                            </Typography>
+                                            {formData?.entryTypes.map((entryType, index) => (
+                                                <Grid container spacing={2} alignItems="center" style={{marginTop: "4px"}} key={index}>
+                                                    <Grid item xs={4}>
+                                                        <TextField
+                                                            label="Name"
+                                                            fullWidth
+                                                            size="small"
+                                                            value={entryType.name}
+                                                            onChange={(e) =>
+                                                                handleEntryTypeChange(index, "name", e.target.value)
+                                                            }
+                                                        />
+                                                    </Grid>
+                                                    <Grid item xs={3}>
+                                                        <TextField
+                                                            label="Amount"
+                                                            type="number"
+                                                            size="small"
+                                                            fullWidth
+                                                            value={entryType.amount}
+                                                            onChange={(e) =>
+                                                                handleEntryTypeChange(index, "amount", e.target.value)
+                                                            }
+                                                        />
+                                                    </Grid>
+                                                    <Grid item xs={3}>
+                                                        <TextField
+                                                            label="Count"
+                                                            type="number"
+                                                            size="small"
+                                                            fullWidth
+                                                            value={entryType.count}
+                                                            onChange={(e) =>
+                                                                handleEntryTypeChange(index, "count", e.target.value)
+                                                            }
+                                                        />
+                                                    </Grid>
+                                                    <Grid item xs={2}>
+                                                        <IconButton
+                                                            color="error"
+                                                            onClick={() => removeEntryType(index)}
+                                                        >
+                                                            <Remove />
+                                                        </IconButton>
+                                                    </Grid>
+                                                </Grid>
+                                            ))}
                             <Button
                                 onClick={addEntryType}
                                 variant="outlined"
-                                color="primary"
+                                color="success"
+                                size="small"
                                 style={{ marginTop: "16px" }}
                             >
-                                Add Entry Type
+                                <Add /> Add Entry Type
                             </Button>
 
                             <Button

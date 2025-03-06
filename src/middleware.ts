@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 // Middleware function to handle token authentication and redirection
 export function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
-    const isPublicPath = path === "/signin" || path === "/signup";
+    const isPublicPath = path === "/auth";
     const token = req.cookies.get("token")?.value || '';
 
     // Function to decode JWT token
@@ -32,7 +32,7 @@ export function middleware(req: NextRequest) {
 
     // Redirect if token is expired
     if (decoded && isTokenExpired(decoded)) {
-        const response = NextResponse.redirect(new URL('/signin', req.nextUrl));
+        const response = NextResponse.redirect(new URL('/auth', req.nextUrl));
         // Delete the expired token from cookies
         response.cookies.set("token", "", {
             httpOnly: true,
@@ -43,7 +43,7 @@ export function middleware(req: NextRequest) {
 
     // Redirect to login if accessing protected route without token
     if (!isPublicPath && path !== "/events" && !token) {
-        return NextResponse.redirect(new URL('/signin', req.nextUrl));
+        return NextResponse.redirect(new URL('/auth', req.nextUrl));
     }
 
     // Redirect to dashboard if trying to access public path with token

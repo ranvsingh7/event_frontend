@@ -21,7 +21,7 @@ import { CustomJwtPayload, Event as EventType } from "../../types/types";
 import { apiRequest } from "@/utils/api";
 import { Add, Remove } from "@mui/icons-material";
 import { jwtDecode } from "jwt-decode";
-import { QRCodeSVG } from "qrcode.react";
+import Pass from "./Pass";
 
 const Dashboard = () => {
   const [events, setEvents] = useState<EventType[]>([]);
@@ -33,6 +33,7 @@ const Dashboard = () => {
   const [bookEvent, setBookEvent] = useState<EventType | null>(null);
   const [digitalPassOpen, setDigitalPassOpen] = useState<boolean>(false);
   const [passDetails, setPassDetails] = useState<any>(null);
+  const [demoPassOpen, setDemoPassOpen] = useState<boolean>(false)
   const [bookEventDetails, setBookEventDetails] = useState({
     eventId: "",
     name: "",
@@ -168,6 +169,9 @@ const Dashboard = () => {
   };
 
   const removeEntryType = (index: number) => {
+    if(editEvent?.entryTypes.length === 1){
+      return
+    }
     if (editEvent) {
       const updatedEntryTypes = editEvent.entryTypes.filter(
         (_, i) => i !== index
@@ -221,13 +225,17 @@ const Dashboard = () => {
   const handleBookSave = async () => {
     const { selectValue, ...bookingData } = bookEventDetails;
     console.log(selectValue);
+    const token = document.cookie.replace(
+      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+      "$1"
+    )
 
     try {
       setLoading(true);
       const response = await apiRequest(
-        `/api/bookings/create-booking`,
+        `/api/bookings/auth/create-booking`,
         "POST",
-        bookingData
+        bookingData,token
       );
       setBookDialogOpen(false);
       setPassDetails(response);
@@ -311,6 +319,11 @@ const Dashboard = () => {
         fullWidth
       >
         <DialogTitle>Edit Event</DialogTitle>
+        <Button onClick={()=>setDemoPassOpen(true)}>Show Demo Pass</Button>
+                        <Pass open={demoPassOpen} dialogClose={()=>{setDemoPassOpen(false)}} passData={{
+                            eventName: editEvent?.name,
+                            eventDesc: editEvent?.description
+                        }} demoPass />
         <DialogContent>
           <TextField
             margin="dense"
@@ -353,7 +366,7 @@ const Dashboard = () => {
             Entry Types
           </Typography>
           {editEvent?.entryTypes.map((entryType, index) => (
-            <Grid container spacing={2} alignItems="center" key={index}>
+            <Grid container spacing={2} alignItems="center" style={{marginTop: "4px"}} key={index}>
               <Grid item xs={4}>
                 <TextField
                   label="Name"
@@ -398,7 +411,7 @@ const Dashboard = () => {
           ))}
           <Button
             variant="outlined"
-            color="primary"
+            color="success"
             sx={{ mt: 2 }}
             onClick={addEntryType}
           >
@@ -406,7 +419,7 @@ const Dashboard = () => {
           </Button>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEditClose} color="secondary">
+          <Button onClick={handleEditClose} color="warning">
             Cancel
           </Button>
           <Button onClick={handleEditSave} color="primary">
@@ -469,53 +482,10 @@ const Dashboard = () => {
       </Dialog>
 
       {/* Digital Pass Dialog */}
-      <Dialog
-        open={digitalPassOpen}
-        onClose={() => setDigitalPassOpen(false)}
-        fullWidth
-      >
-        <DialogContent>
-          {passDetails ? (
-            <Card>
-              <CardContent>
-                <Typography variant="h6">Digital Pass</Typography>
-                <Typography variant="body1">
-                  <strong>Name:</strong> {passDetails.name}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Email:</strong> {passDetails.email}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Mobile:</strong> {passDetails.mobile}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Event:</strong> {passDetails.eventId?.name}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Entry Type:</strong> {passDetails.entryTitle}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Date:</strong>{" "}
-                  {new Date(passDetails.date).toLocaleString()}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Amount:</strong> ₹ {passDetails.amount}
-                </Typography>
-
-                {/* QR Code */}
-                <div style={{ marginTop: "1rem", textAlign: "center" }}>
-                  <QRCodeSVG
-                    value={JSON.stringify(passDetails._id)}
-                    size={150}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Typography>Loading pass details...</Typography>
-          )}
-        </DialogContent>
-      </Dialog>
+      <Pass open={digitalPassOpen} passData={passDetails} dialogClose={()=>{
+            setDigitalPassOpen(false);
+            setPassDetails(null)
+          }} />
     </div>
   );
 };
