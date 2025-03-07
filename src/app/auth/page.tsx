@@ -10,10 +10,12 @@ export default function Signin() {
 
 
     return (
+        <div>
+            <img className="absolute inset-0 w-full h-full object-cover" alt="" width={100} height={100} src="https://res.cloudinary.com/dsluib7tj/image/upload/f_auto/q_auto/v1/event-pulse/hero-ticket_j0ccun?_a=DAJCwlWIZAA0" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-blue-900/70"></div>
         <div className={`container ${active ? "active" : ""}`}>
             <Login />
             <Signup onSuccess={()=>setActive(false)}/>
-
           <div className="toggle-box">
               <div className="toggle-panel toggle-left">
                   <h1>Hello, Welcome!</h1>
@@ -28,6 +30,7 @@ export default function Signin() {
               </div>
           </div>
 
+        </div>
         </div>
     );
 }

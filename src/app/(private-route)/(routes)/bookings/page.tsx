@@ -6,7 +6,6 @@ import {
     Grid,
     Card,
     CardContent,
-    CircularProgress,
     TextField,
     Button,
     // Button,
@@ -17,6 +16,7 @@ import { jwtDecode } from "jwt-decode";
 import { motion } from 'framer-motion';
 import { useTheme } from '@mui/material/styles';
 import Pass from "@/app/components/Pass";
+import Loading from "@/app/components/ui/Loading";
 
 const BookingPage = () => {
     const [bookings, setBookings] = useState<Booking[]>([]);
@@ -94,10 +94,7 @@ const BookingPage = () => {
 
     return (
         <div className="p-6 mt-4">
-            <Typography variant="h4" gutterBottom>
-                My Bookings
-            </Typography>
-
+<h1 className="text-white text-[50px] font-bold">My Events</h1>
             <TextField
                 label="Search by Name"
                 style={{width:"400px", marginBottom: "24px"}}
@@ -107,9 +104,12 @@ const BookingPage = () => {
             />
 
             {loading ? (
-                <CircularProgress />
+                <Loading loading={loading}/>
             ) : error ? (
-                <Typography color="error">{error}</Typography>
+                <div className="bg-[#060a13]  text-white p-4 w-[820px] mt-5 rounded-xl flex flex-col gap-6 items-center">
+          <p className="text-[46px] font-[900] italic">{error}</p>
+          {/* <Image src="/logo/404.jpg" width={400} height={200} alt="logo"/> */}
+        </div>
             ) : filteredBookings.length === 0 ? (
                 <Typography>No bookings found.</Typography>
             ) : (

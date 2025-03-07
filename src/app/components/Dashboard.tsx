@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react";
 import {
-  Card,
-  CardContent,
   Typography,
   Grid,
   Button,
-  CircularProgress,
   TextField,
   Dialog,
   DialogActions,
@@ -22,6 +19,8 @@ import { apiRequest } from "@/utils/api";
 import { Add, Remove } from "@mui/icons-material";
 import { jwtDecode } from "jwt-decode";
 import Pass from "./Pass";
+import Loading from "./ui/Loading";
+import Link from "next/link";
 
 const Dashboard = () => {
   const [events, setEvents] = useState<EventType[]>([]);
@@ -197,6 +196,7 @@ const Dashboard = () => {
       selectValue: "",
     });
   };
+  console.log(error)
 
   const handleBookInputChange = (
     field: keyof typeof bookEventDetails,
@@ -230,12 +230,23 @@ const Dashboard = () => {
       "$1"
     )
 
+    const paymentDetails={
+      success: true,
+      paymentMode: "cash",
+    }
+
+    const data = {
+      ...bookingData, paymentDetails
+    }
+
+    console.log(data)
+
     try {
       setLoading(true);
       const response = await apiRequest(
         `/api/bookings/auth/create-booking`,
         "POST",
-        bookingData,token
+        data,token
       );
       setBookDialogOpen(false);
       setPassDetails(response);
@@ -248,69 +259,64 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container">
-      <Typography variant="h4" gutterBottom>
-        All Events
-      </Typography>
-
-      {loading ? (
-        <CircularProgress />
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : (
-        <Grid container spacing={3}>
-          {events.map((event) => (
-            <Grid item xs={12} sm={6} md={4} key={event._id}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6">{event.name}</Typography>
-                  <Typography variant="body2">{event.description}</Typography>
-                  <Typography variant="body2">
-                    {new Date(event.date).toLocaleString()}
-                  </Typography>
-                  <Typography variant="body2">
-                    Location: {event.location}
-                  </Typography>
-
-                  <Typography variant="h6" color="primary">
-                    Entry Types:
-                  </Typography>
-                  {event.entryTypes.map((entryType) => (
-                    <Typography key={entryType.name} variant="body2">
-                      {entryType.name} - ₹{entryType.amount}
-                    </Typography>
-                  ))}
-
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{ mt: 2 }}
-                    onClick={() => handleBookOpen(event)}
-                  >
-                    Book Pass
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    sx={{ mt: 2, ml: 1 }}
-                    onClick={() => handleDelete(event._id)}
-                  >
-                    Delete
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    sx={{ mt: 2, ml: 1 }}
-                    onClick={() => handleEditOpen(event)}
-                  >
-                    Edit
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
+    <div className="container p-6">
+      <h1 className="text-white text-[50px] font-bold">My Events</h1>
+        <div>
+          <Loading loading={loading}/>
+          {events.length <= 0 && !loading && <div className="bg-[#060a13]  text-white p-4 w-[820px] mt-5 rounded-xl flex flex-col gap-6 items-center">
+          <p className="text-[46px] font-[900] italic">No Events Found, <span className="text-[#f96982]"><Link href="/create-event">Create Now!</Link></span></p>
+          {/* <Image src="/logo/404.jpg" width={400} height={200} alt="logo"/> */}
+        </div>}
+          {events.map((event)=>(
+            <div className="bg-[#060a13] text-white p-4 w-[600px] mt-5 rounded-xl" key={event._id}>
+              <p className="text-[46px] font-[900] italic">{event.name}</p>
+              <p className="max-w-[70%]">{event.description}</p>
+              <div className="flex mt-6 justify-between ">
+              <div className="italic font-bold">
+              <p>{new Date(event.date).toLocaleString()}</p>
+              <p>{event.location}</p>
+              </div>
+              <div className="text-right">
+              <p className="font-bold text-[20px]">
+                  Entry Types:
+                </p>
+                {event.entryTypes.map((entryType) => (
+                  <p key={entryType.name} className="italic text-[14px]">
+                    {entryType.name} - ₹{entryType.amount}
+                  </p>
+                ))}
+              </div>
+              </div>
+              <div className="flex gap-2 justify-center">
+              <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 2 }}
+                  onClick={() => handleBookOpen(event)}
+                >
+                  BOOK NOW
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{ mt: 2 }}
+                  onClick={() => handleEditOpen(event)}
+                >
+                  Update Event
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  sx={{ mt: 2 }}
+                  onClick={() => handleDelete(event._id)}
+                >
+                  Delete Event
+                </Button>
+              </div>
+            </div>
+          ))
+          }
+          </div>
 
       <Dialog
         open={editDialogOpen}
@@ -433,13 +439,14 @@ const Dashboard = () => {
         maxWidth="sm"
         onClose={() => setBookDialogOpen(false)}
       >
-        <DialogTitle>Book Pass</DialogTitle>
-        <DialogContent>
-          <Typography variant="h6">{bookEvent?.name}</Typography>
-          <Typography variant="body2">
+        <div className="p-4 max-w-[400px]">
+        <div className="mb-6">
+        <p className="text-[30px] font-bold text-center">Book Pass</p>
+          <p className="text-[18px] font-semibold text-center">{bookEvent?.name}</p>
+          <p className="text-[14px] font-semibold text-center">
             Location: {bookEvent?.location}
-          </Typography>
-        </DialogContent>
+          </p>
+        </div>
         {/* select entry type and count of pass  */}
         <TextField
           margin="dense"
@@ -462,6 +469,7 @@ const Dashboard = () => {
           value={bookEventDetails?.mobile || ""}
           onChange={(e) => handleBookInputChange("mobile", e.target.value)}
         />
+        <p className="text-xs font-semibold mt-2">Select Entry</p>
         <Select
           fullWidth
           value={bookEventDetails?.selectValue || ""}
@@ -474,11 +482,12 @@ const Dashboard = () => {
           ))}
         </Select>
         <DialogActions>
-          <Button color="secondary">Cancel</Button>
+          <Button color="secondary" onClick={()=>setBookDialogOpen(false)}>Cancel</Button>
           <Button color="primary" onClick={handleBookSave}>
             Book
           </Button>
         </DialogActions>
+        </div>
       </Dialog>
 
       {/* Digital Pass Dialog */}

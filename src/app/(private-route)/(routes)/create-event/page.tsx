@@ -87,7 +87,7 @@ const CreateEvent = () => {
     
 
     return (
-        <Grid container justifyContent="center" alignItems="center" style={{ minHeight: "100vh", width: "100%" }}>
+        <Grid container justifyContent="center" alignItems="center" style={{ marginTop:"30px", width: "100%" }}>
             <Grid item xs={12} sm={8} md={6}>
                 <Card>
                     <CardContent>

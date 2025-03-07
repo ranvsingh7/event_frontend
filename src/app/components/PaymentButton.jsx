@@ -1,6 +1,5 @@
-import { div } from "framer-motion/client";
 import Script from "next/script";
-import React, { useEffect } from "react";
+import React from "react";
 
 const PaymentButton = ({ amount, paymentSuccess}) => {
 
@@ -37,7 +36,7 @@ const PaymentButton = ({ amount, paymentSuccess}) => {
         key: "rzp_test_6nr1Kj7gZSDb5v", // Replace with your Razorpay Key ID
         amount: order.amount, // Amount in paise
         currency: order.currency,
-        name: "Test Payment",
+        name: "Event Pulse",
         description: "Test Transaction",
         order_id: order.id, // Order ID from the backend
         handler: function (response) {
@@ -45,7 +44,7 @@ const PaymentButton = ({ amount, paymentSuccess}) => {
           paymentSuccess(response.razorpay_payment_id);
         },
         prefill: {
-          name: "John Doe",
+          name: "Ranveer Singh",
           email: "john.doe@example.com",
           contact: "9999999999",
         },
@@ -70,6 +69,7 @@ const PaymentButton = ({ amount, paymentSuccess}) => {
       />
     <button
       onClick={handlePayment}
+      disabled={amount<=0}
       style={{
         padding: "10px 20px",
         backgroundColor: "#3399cc",
