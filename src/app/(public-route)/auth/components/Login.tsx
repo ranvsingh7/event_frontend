@@ -28,7 +28,7 @@ const Login = () => {
             const result = await apiRequest<{ message: string; token: string }>("/api/auth/signin", "POST", formData);
             toast.success(result.message);
             document.cookie = `token=${result.token}; path=/;`;
-            window.location.href = "/";
+            window.location.href = "/dashboard";
         } catch (err: any) {
             toast.error(err.message);
         } finally {

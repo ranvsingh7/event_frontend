@@ -40,21 +40,27 @@ const PublicNav = () => {
       <div className="hidden md:flex space-x-8 text-white">
         <Link
           className="inline-flex items-center px-1 pt-1 border-b-2 leading-5 transition duration-150 ease-in-out focus:outline-none border-white focus:border-[#001858] "
-          href="https://www.event-pulse.com/"
+          href="/"
         >
           Home
         </Link>
         <Link
           className="inline-flex items-center px-1 pt-1 border-b-2 leading-5 transition duration-150 ease-in-out focus:outline-none border-transparent focus:text-gray-700 focus:border-gray-300 "
-          href="/about-us"
+          href="/terms-and-condition"
         >
-          About Us
+          Terms and Condition
         </Link>
         <Link
           className="inline-flex items-center px-1 pt-1 border-b-2 leading-5 transition duration-150 ease-in-out focus:outline-none border-transparent focus:text-gray-700 focus:border-gray-300 "
           href="/contact-us"
         >
           Contact Us
+        </Link>
+        <Link
+          className="inline-flex items-center px-1 pt-1 border-b-2 leading-5 transition duration-150 ease-in-out focus:outline-none border-transparent focus:text-gray-700 focus:border-gray-300 "
+          href="/refund-and-cancellation"
+        >
+          Refund and Cancellation
         </Link>
       </div>
       <Link

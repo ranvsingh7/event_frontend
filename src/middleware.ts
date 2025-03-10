@@ -1,18 +1,26 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
-// Middleware function to handle token authentication and redirection
 export function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
-    const isPublicPath = path === "/auth";
-    const token = req.cookies.get("token")?.value || '';
+
+    // Define public paths that anyone can access
+    const isPublicPath =
+        path === "/auth" ||
+        path === "/contact-us" ||
+        path === "/terms-and-condition" ||
+        path === "/refund-and-cancellation" ||
+        path === "/events" ||
+        path === "/";
+
+    const token = req.cookies.get("token")?.value || "";
 
     // Function to decode JWT token
-    function decodeJWT(token: string | undefined): { header: any; payload: any; } | null {
+    function decodeJWT(token: string | undefined): { header: any; payload: any } | null {
         if (!token) return null;
 
         try {
-            const [headerEncoded, payloadEncoded] = token.split('.').slice(0, 2);
+            const [headerEncoded, payloadEncoded] = token.split(".").slice(0, 2);
             const header = JSON.parse(atob(headerEncoded));
             const payload = JSON.parse(atob(payloadEncoded));
             return { header, payload };
@@ -32,35 +40,34 @@ export function middleware(req: NextRequest) {
 
     // Redirect if token is expired
     if (decoded && isTokenExpired(decoded)) {
-        const response = NextResponse.redirect(new URL('/auth', req.nextUrl));
+        const response = NextResponse.redirect(new URL("/auth", req.nextUrl));
         // Delete the expired token from cookies
         response.cookies.set("token", "", {
             httpOnly: true,
-            expires: new Date(0)
+            expires: new Date(0),
         });
         return response;
     }
 
+    // Redirect logged-in users away from /auth to /
+    if (path === "/auth" && token) {
+        return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+    }
+
     // Redirect to login if accessing protected route without token
-    if (!isPublicPath && path !== "/events" && !token) {
-        return NextResponse.redirect(new URL('/auth', req.nextUrl));
+    if (!isPublicPath && !token) {
+        return NextResponse.redirect(new URL("/auth", req.nextUrl));
     }
 
-    // Redirect to dashboard if trying to access public path with token
-    if (isPublicPath && token) {
-        return NextResponse.redirect(new URL('/', req.nextUrl));
-    }
-
-    // Allow access to "/events" regardless of token
-    if (path === "/events") {
+    // Allow access to public routes for everyone
+    if (isPublicPath) {
         return NextResponse.next();
     }
+
+    // Allow access to other routes if authenticated
+    return NextResponse.next();
 }
 
-// Configuration for middleware execution
 export const config = {
-    // Regular expression to match URLs where the middleware should be applied
-    matcher: [
-        '/((?!api|_next/static|_next/image|favicon.ico).*)',
-    ]
-}
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};

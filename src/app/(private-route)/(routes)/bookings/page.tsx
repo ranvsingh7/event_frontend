@@ -94,7 +94,7 @@ const BookingPage = () => {
 
     return (
         <div className="p-6 mt-4">
-<h1 className="text-white text-[50px] font-bold">My Events</h1>
+<h1 className="text-white text-[50px] font-bold">My Bookings</h1>
             <TextField
                 label="Search by Name"
                 style={{width:"400px", marginBottom: "24px"}}

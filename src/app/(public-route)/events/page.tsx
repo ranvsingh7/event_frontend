@@ -9,14 +9,14 @@ import {
   TextField,
 } from "@mui/material";
 import React, {  useEffect,  useState } from "react";
-import { Event as EventType } from "../../types/types";
+import { Event as EventType } from "../../../types/types";
 import { apiRequest } from "@/utils/api";
-import Pass from "../components/Pass";
-import PaymentButton from "../components/PaymentButton";
+import Pass from "../../components/Pass";
+import PaymentButton from "../../components/PaymentButton";
 import toast from "react-hot-toast";
-import PublicNav from "../components/PublicNav";
+import PublicNav from "../../components/PublicNav";
 import Image from "next/image";
-import Loading from "../components/ui/Loading";
+import Loading from "../../components/ui/Loading";
 
 const Events = () => {
   const [events, setEvents] = useState<EventType[]>([]);
