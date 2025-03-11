@@ -103,28 +103,14 @@ const Events = () => {
       setBookEventDetails({ ...bookEventDetails, [field]: value });
     }
   };
-
-  const handleBookSave = async (value:string) => {
+console.log(bookEventDetails)
+  const handleBookSave = async (paymentDetails:string) => {
     const { selectValue, ...bookingData } = bookEventDetails;
     console.log(selectValue)
     setLoading(true);
     try {
-      const paymentDetails = await apiRequest(
-        `/api/razorpay/payment-status/${value}`,
-        "GET",
-      )
       const data = {...bookingData, paymentDetails}
-      // capture payment 
-      const capturedData = {
-        amount: bookEventDetails.amount,
-        paymentId: value
-      }
-      const capturePayment = await apiRequest(
-        `/api/razorpay/capture-payment`,
-        "POST",
-        capturedData
-      )
-      console.log(capturePayment)
+      // console.log(paymentDetails)
       const response = await apiRequest(
         `/api/bookings/create-booking`,
         "POST",
@@ -239,7 +225,7 @@ const Events = () => {
           <Button color="secondary" onClick={()=>{
             setBookDialogOpen(false)
           }}>Cancel</Button>
-          <PaymentButton amount={amount} paymentSuccess={(value:string)=>{handleBookSave(value)}} />
+          <PaymentButton amount={amount} paymentSuccess={(value:string)=>{handleBookSave(value)}} customerData={{customer_name: bookEventDetails.name, customer_email:bookEventDetails.email, customer_phone:bookEventDetails.mobile, customer_id:bookEventDetails.mobile}} />
         </DialogActions>
         </div>
       </Dialog>
