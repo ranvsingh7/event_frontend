@@ -104,10 +104,12 @@ const Events = () => {
     }
   };
 console.log(bookEventDetails)
-  const handleBookSave = async (paymentDetails:string) => {
+  const handleBookSave = async (paymentDetails:any) => {
     const { selectValue, ...bookingData } = bookEventDetails;
     console.log(selectValue)
+    if(!paymentDetails) return
     setLoading(true);
+    // if(!paymentDetails.payment_status || paymentDetails.payment_status === undefined) return
     try {
       const data = {...bookingData, paymentDetails}
       // console.log(paymentDetails)
@@ -225,7 +227,7 @@ console.log(bookEventDetails)
           <Button color="secondary" onClick={()=>{
             setBookDialogOpen(false)
           }}>Cancel</Button>
-          <PaymentButton amount={amount} paymentSuccess={(value:string)=>{handleBookSave(value)}} customerData={{customer_name: bookEventDetails.name, customer_email:bookEventDetails.email, customer_phone:bookEventDetails.mobile, customer_id:bookEventDetails.mobile}} />
+          <PaymentButton amount={amount} paymentSuccess={(value:object)=>{handleBookSave(value)}} customerData={{customer_name: bookEventDetails.name, customer_email:bookEventDetails.email, customer_phone:bookEventDetails.mobile, customer_id:bookEventDetails.mobile}} />
         </DialogActions>
         </div>
       </Dialog>
