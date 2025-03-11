@@ -1,72 +1,81 @@
-import Script from "next/script";
-import React from "react";
+import React, { useState } from "react";
+import {load} from "@cashfreepayments/cashfree-js"
+import axios from "axios";
 
 const PaymentButton = ({ amount, paymentSuccess}) => {
+  let cashfree;
 
-  const handlePayment = async () => {
+  let insitialzeSDK = async function () {
+
+    cashfree = await load({
+      mode: "production",
+    })
+  }
+
+  insitialzeSDK()
+
+  const [orderId, setOrderId] = useState("")
+
+
+
+  const getSessionId = async () => {
     try {
-      // Step 1: Create an order using your backend API
-      const response = await fetch("http://localhost:5001/api/razorpay/create-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: amount, // Amount in INR
-          currency: "INR",
-          receipt: "receipt_test_001",
-        }),
-      });
+      let res = await axios.get("http://localhost:5001/api/cashfree/payment")
+      
+      if(res.data && res.data.payment_session_id){
 
-      const { order } = await response.json();
-
-      if (!order) {
-        alert("Failed to create order");
-        return;
+        console.log(res.data)
+        setOrderId(res.data.order_id)
+        return res.data.payment_session_id
       }
 
-      // Step 2: Verify Razorpay script is loaded
-      if (typeof window.Razorpay === "undefined") {
-        alert("Razorpay SDK failed to load. Please refresh the page.");
-        return;
-      }
 
-      // Step 3: Initiate Razorpay Payment
-      const options = {
-        key: "rzp_test_6nr1Kj7gZSDb5v", // Replace with your Razorpay Key ID
-        amount: order.amount, // Amount in paise
-        currency: order.currency,
-        name: "Event Pulse",
-        description: "Test Transaction",
-        order_id: order.id, // Order ID from the backend
-        handler: function (response) {
-          // alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
-          paymentSuccess(response.razorpay_payment_id);
-        },
-        prefill: {
-          name: "Ranveer Singh",
-          email: "john.doe@example.com",
-          contact: "9999999999",
-        },
-        theme: {
-          color: "#3399cc",
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
     } catch (error) {
-      console.error("Error during payment:", error);
-      alert("Something went wrong!");
+      console.log(error)
     }
-  };
+  }
+
+  const verifyPayment = async () => {
+    try {
+      
+      let res = await axios.post("http://localhost:5001/api/cashfree/verify", {
+        orderId: orderId
+      })
+
+      if(res && res.data){
+        alert("payment verified")
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handlePayment = async (e) => {
+    e.preventDefault()
+    try {
+
+      let sessionId = await getSessionId()
+      let checkoutOptions = {
+        paymentSessionId : sessionId,
+        redirectTarget:"_modal",
+      }
+
+      cashfree.checkout(checkoutOptions).then((res) => {
+        console.log("payment initialized")
+
+        verifyPayment(orderId)
+      })
+
+
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
 
   return (
     <div>
-      <Script
-        id="razorpay-checkout-js"
-        src="https://checkout.razorpay.com/v1/checkout.js"
-      />
     <button
       onClick={handlePayment}
       disabled={amount<=0}
