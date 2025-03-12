@@ -22,7 +22,7 @@ const PaymentButton = ({ amount, paymentSuccess, customerData }) => {
   const getSessionId = async () => {
     try {
       const response = await fetch("http://localhost:5001/api/cashfree/payment", {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
