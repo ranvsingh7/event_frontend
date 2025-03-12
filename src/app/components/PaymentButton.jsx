@@ -1,120 +1,98 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { load } from "@cashfreepayments/cashfree-js";
+import toast from "react-hot-toast";
 
 const PaymentButton = ({ amount, paymentSuccess, customerData }) => {
-  const [cashfree, setCashfree] = useState(null);
-  const [orderId, setOrderId] = useState("");
+  let cashfree;
+    var initializeSDK = async function () {          
+        cashfree = await load({
+            mode: "production"
+        });
+    }
+    initializeSDK();
 
-  useEffect(() => {
-    // Initialize Cashfree SDK
-    const initializeSDK = async () => {
+    const createOrder = async () => {
       try {
-        const mode = process.env.NODE_ENV === "development" ? "sandbox" : "production";
-        const sdkInstance = await load({ mode });
-        setCashfree(sdkInstance);
+        const response = await fetch("http://localhost:5001/api/cashfree/create-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            order_amount: amount,
+            customer_details: customerData,
+          }),
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to create order");
+        }
+  
+        const data = await response.json();
+        // console.log(data.data.order_id)
+        const id = {
+          payment_session_id:data.data.payment_session_id,
+          order_id: data.data.order_id
+        }
+        return id;
       } catch (error) {
-        console.error("Error initializing Cashfree SDK:", error);
+        console.error("Error creating order:", error);
+        toast.error("Failed to initiate payment. Please try again.");
+        return null;
       }
     };
-    initializeSDK();
-  }, []);
 
-  const getSessionId = async () => {
-    try {
-      const response = await fetch("http://localhost:5001/api/cashfree/payment", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount,
-          customer_name: customerData.customer_name,
-          customer_email: customerData.customer_email,
-          customer_phone: customerData.customer_phone,
-          customer_id: customerData.customer_id,
-        }),
-      });
+    const doPayment = async () => {
+      const {payment_session_id, order_id} = await createOrder();
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-
-      if (data && data.payment_session_id) {
-        setOrderId(data.order_id);
-        return {
-          payment_session_id: data.payment_session_id,
-          order_id: data.order_id,
+        let checkoutOptions = {
+            paymentSessionId: payment_session_id,
+            redirectTarget: "_modal",
         };
-      } else {
-        throw new Error("Invalid response from server.");
-      }
-    } catch (error) {
-      console.error("Error fetching session ID:", error);
-      throw error;
-    }
-  };
-
-  const verifyPayment = async (order_id) => {
-    try {
-      const response = await fetch("http://localhost:5001/api/cashfree/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ orderId: order_id }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-
-      if (data) {
-        paymentSuccess(data[0]);
-      } else {
-        console.error("Payment verification failed.");
-      }
-    } catch (error) {
-      console.error("Error verifying payment:", error);
-    }
-  };
-
-  const handlePayment = async (e) => {
-    e.preventDefault();
-
-    if (!cashfree) {
-      console.error("Cashfree SDK is not initialized.");
-      return;
-    }
-
-    try {
-      const sessionData = await getSessionId();
-
-      const checkoutOptions = {
-        paymentSessionId: sessionData.payment_session_id,
-        redirectTarget: "_modal",
-      };
-
-      cashfree
-        .checkout(checkoutOptions)
-        .then(() => {
-          verifyPayment(sessionData.order_id);
-        })
-        .catch((error) => {
-          console.error("Error during checkout:", error);
+        cashfree.checkout(checkoutOptions).then(async (result) => {
+            if(result.error){
+                // console.log("User has closed the popup or there is some payment error, Check for Payment Status");
+                console.log(result.error);
+            }
+            if(result.redirect){
+                console.log("Payment will be redirected");
+            }
+            if(result.paymentDetails){
+                // console.log("Payment has been completed, Check for Payment Status");
+                await verifyPayment(order_id);
+          
+            }
         });
-    } catch (error) {
-      console.error("Error handling payment:", error);
-    }
-  };
+    };
+
+    const verifyPayment = async (order_id) => {
+      try {
+        const response = await fetch(`http://localhost:5001/api/cashfree/verify-payment/${order_id}`);
+        if (!response.ok) {
+          throw new Error("Failed to verify payment");
+        }
+    
+        const data = await response.json();
+        console.log("Verification Response:", data);
+    
+        if (data.orderStatus === "Success") {
+          toast.success("Payment Successful!");
+          paymentSuccess(data.payments[0]); // Call parent function to handle successful payment
+        } else if (data.orderStatus === "Pending") {
+          toast.error("Payment is pending. Please wait for confirmation.");
+        } else {
+          toast.error("Payment failed. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error verifying payment:", error);
+        toast.error("Failed to verify payment. Please try again.");
+      }
+    };
 
   return (
     <div>
       <button
-        onClick={handlePayment}
+        onClick={doPayment}
         disabled={amount <= 0}
         style={{
           padding: "10px 20px",

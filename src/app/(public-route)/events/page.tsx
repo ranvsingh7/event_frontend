@@ -109,15 +109,14 @@ console.log(bookEventDetails)
     console.log(selectValue)
     if(!paymentDetails) return
     setLoading(true);
-    // if(!paymentDetails.payment_status || paymentDetails.payment_status === undefined) return
     try {
       const data = {...bookingData, paymentDetails}
-      // console.log(paymentDetails)
       const response = await apiRequest(
         `/api/bookings/create-booking`,
         "POST",
         data,
       );
+      console.log(response)
       toast.success("Pass Book Successfully")
       setBookDialogOpen(false);
       setPassDetails(response);
