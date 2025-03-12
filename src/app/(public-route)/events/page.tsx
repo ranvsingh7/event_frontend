@@ -134,18 +134,18 @@ console.log(bookEventDetails)
       <div className="absolute inset-0">
       <PublicNav />
 
-      <div className="pt-[100px] pl-[150px] overflow-auto h-[90vh]">
+      <div className="px-10 min-[850px]:pt-[100px] min-[850px]:pl-[150px] overflow-auto h-[90vh]">
         <h1 className="bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent text-[56px] font-semibold">Ongoing Events</h1>
         <div>
           <Loading loading={loading}/>
-          {events.length <= 0 && !loading && <div className="bg-[#060a13]  text-white p-4 w-[820px] mt-5 rounded-xl flex flex-col gap-6 items-center">
+          {events.length <= 0 && !loading && <div className="bg-[#060a13]  text-white p-4 w-full min-[1024px]:w-[820px] mt-5 rounded-xl flex flex-col gap-6 items-center">
           <p className="text-[46px] font-[900] italic">No Upcoming Events, Stay Tuned.</p>
           <Image src="/logo/coming-soon.jpg" width={400} height={200} alt="logo"/>
         </div>}
           {events.map((event)=>(
-            <div className="bg-[#060a13] text-white p-4 w-[600px] mt-5 rounded-xl" key={event._id}>
+            <div className="bg-[#060a13] text-white p-4 w-full min-[600px]:w-[600px] mt-5 rounded-xl" key={event._id}>
               <p className="text-[46px] font-[900] italic">{event.name}</p>
-              <p className="max-w-[70%]">{event.description}</p>
+              <p className="min-[600px]:max-w-[70%]">{event.description}</p>
               <div className="flex mt-6 justify-between ">
               <div className="italic font-bold">
               <p>{new Date(event.date).toLocaleString()}</p>
