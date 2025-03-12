@@ -69,7 +69,7 @@ const PaymentButton = ({ amount, paymentSuccess, customerData }) => {
 
     const verifyPayment = async (order_id) => {
       try {
-        const response = await fetch(`http://localhost:5001/api/cashfree/verify-payment/${order_id}`);
+        const response = await fetch(`${baseUrl}/api/cashfree/verify-payment/${order_id}`);
         if (!response.ok) {
           throw new Error("Failed to verify payment");
         }
