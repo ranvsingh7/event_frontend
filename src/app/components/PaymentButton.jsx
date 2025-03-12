@@ -3,17 +3,19 @@ import { load } from "@cashfreepayments/cashfree-js";
 import toast from "react-hot-toast";
 
 const PaymentButton = ({ amount, paymentSuccess, customerData }) => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
   let cashfree;
     var initializeSDK = async function () {          
         cashfree = await load({
-            mode: "production"
+            mode: "sandbox"
         });
     }
     initializeSDK();
 
+
     const createOrder = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/cashfree/create-order", {
+        const response = await fetch(`${baseUrl}/api/cashfree/create-order`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
