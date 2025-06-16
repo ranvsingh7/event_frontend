@@ -1,11 +1,13 @@
 "use client"
+import Image from 'next/image'
 import React from 'react'
+import Logo from "@/../public/new-logo.png"
 
 
 const page = () => {
   return (
-    <div>test
-      {/* <PaymentButton amount={10000} paymentSuccess={()=>{console.log("success")}} /> */}
+    <div className='bg-gray-900'>test
+      <Image src={Logo} alt='logo' width={1000} height={1000}/>
     </div>
   )
 }

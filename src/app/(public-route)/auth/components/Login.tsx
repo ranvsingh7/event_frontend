@@ -1,6 +1,6 @@
 import { apiRequest } from '@/utils/api';
 import { TextField } from '@mui/material';
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface FormData {
@@ -35,37 +35,49 @@ const Login = () => {
             setLoading(false);
         }
     };
-  return (
-    <div className="form-box login">
-    <form onSubmit={handleSubmit} >
-    <h1 className="font-semibold">Login</h1>
-                    <div className="input-box">
-                    <TextField
-                        label="Email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        fullWidth
-                        required
-                    />
-                    </div>
-                    <div className="input-box">
-                    <TextField
-                        label="Password"
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        fullWidth
-                        required
-                    />
-                    </div>
-                    
-                    <button type="submit" disabled={loading} className="btn">Login</button>
-                </form>
-              </div>
-  )
-}
 
-export default Login
+    return (
+        <div className="flex items-center justify-center rounded-xl bg-gray-100">
+            <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
+                <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Login</h1>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <TextField
+                            label="Email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                            className="border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <TextField
+                            label="Password"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                            className="border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full py-2 px-4 text-white font-semibold rounded-md shadow-md transition ${
+                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                        }`}
+                    >
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default Login;

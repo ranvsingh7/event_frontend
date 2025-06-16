@@ -1,36 +1,50 @@
 "use client";
 
 import { useState } from "react";
-import "./signin.css";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 
 export default function Signin() {
-    const [active, setActive] = useState<boolean>(false);
-
+    const [isLogin, setIsLogin] = useState<boolean>(true);
 
     return (
-        <div>
-            <img className="absolute inset-0 w-full h-full object-cover" alt="" width={100} height={100} src="https://res.cloudinary.com/dsluib7tj/image/upload/f_auto/q_auto/v1/event-pulse/hero-ticket_j0ccun?_a=DAJCwlWIZAA0" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-blue-900/70"></div>
-        <div className={`container ${active ? "active" : ""}`}>
-            <Login />
-            <Signup onSuccess={()=>setActive(false)}/>
-          <div className="toggle-box">
-              <div className="toggle-panel toggle-left">
-                  <h1>Hello, Welcome!</h1>
-                  <p>Don't have an account?</p>
-                  <button className="btn register-btn" onClick={()=>setActive(true)}>Register</button>
-              </div>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600 p-6">
+            {/* Header */}
+            <h1 className="text-3xl font-bold text-white mb-6">Welcome to PaperLess</h1>
+            
 
-              <div className="toggle-panel toggle-right">
-                  <h1>Welcome Back!</h1>
-                  <p>Already have an account?</p>
-                  <button className="btn login-btn" onClick={()=>setActive(false)}>Login</button>
-              </div>
-          </div>
+            {/* Toggle Button */}
+            <div className="flex space-x-4 mb-8">
+                <button
+                    className={`px-6 py-2 rounded-full text-lg font-semibold transition ${
+                        isLogin
+                            ? "bg-white text-blue-600 shadow-md"
+                            : "bg-transparent border border-white text-white hover:bg-white hover:text-blue-600"
+                    }`}
+                    onClick={() => setIsLogin(true)}
+                >
+                    Login
+                </button>
+                <button
+                    className={`px-6 py-2 rounded-full text-lg font-semibold transition ${
+                        !isLogin
+                            ? "bg-white text-blue-600 shadow-md"
+                            : "bg-transparent border border-white text-white hover:bg-white hover:text-blue-600"
+                    }`}
+                    onClick={() => setIsLogin(false)}
+                >
+                    Signup
+                </button>
+            </div>
 
-        </div>
+            {/* Form Container */}
+            <div className="w-full max-w-md transform transition duration-300">
+                {isLogin ? (
+                    <Login />
+                ) : (
+                    <Signup onSuccess={() => setIsLogin(true)} />
+                )}
+            </div>
         </div>
     );
 }

@@ -18,6 +18,7 @@ export interface Event {
     description: string;
     date: string;
     location: string;
+    isLive: boolean;
     // createdBy: string;
     entryTypes: EntryType[];
     createdBy: {

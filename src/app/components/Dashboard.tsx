@@ -258,6 +258,35 @@ const Dashboard = () => {
     }
   };
 
+  const handleLive = (e:EventType)=> {
+    // update isLive status of event
+    const token = document.cookie.replace(
+      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+      "$1"
+    );
+    if (!token) {
+      alert("Authentication token not found. Please log in again.");
+      return;
+    }
+    const updatedEvent = {
+      ...e,
+      isLive: !e.isLive,
+    };
+    apiRequest<EventType>(`/api/events/live-event/${e._id}`, "PUT", updatedEvent, token)
+      .then((data) => {
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event._id === data._id ? data : event
+          )
+        );
+        alert(`Event is now ${data.isLive ? "LIVE" : "Stop"}.`);
+      })
+      .catch((err: any) => {
+        alert(err.message || "Failed to update the event status.");
+      });
+
+  }
+
   return (
     <div className="container p-6">
       <h1 className="text-white text-[50px] font-bold">My Events</h1>
@@ -268,7 +297,18 @@ const Dashboard = () => {
           {/* <Image src="/logo/404.jpg" width={400} height={200} alt="logo"/> */}
         </div>}
           {events.map((event)=>(
-            <div className="bg-[#060a13] text-white p-4 w-[600px] mt-5 rounded-xl" key={event._id}>
+            <div className="bg-[#060a13] text-white p-4 w-[600px] mt-5 rounded-xl relative" key={event._id}>
+                        {
+              event.isLive && (
+                <div className="flex items-center space-x-2 absolute top-4 right-4">
+      <div className="relative flex items-center justify-center">
+        <div className="absolute inline-flex h-3 w-3 rounded-full bg-red-500 animate-ping"></div>
+        <div className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></div>
+      </div>
+      <span className="text-sm font-medium">Live</span>
+    </div>
+              )
+                        }
               <p className="text-[46px] font-[900] italic">{event.name}</p>
               <p className="max-w-[70%]">{event.description}</p>
               <div className="flex mt-6 justify-between ">
@@ -288,6 +328,14 @@ const Dashboard = () => {
               </div>
               </div>
               <div className="flex gap-2 justify-center">
+              <Button
+                  variant="contained"
+                  color={event.isLive ? "error" : "success"}
+                  sx={{ mt: 2 }}
+                  onClick={() => handleLive(event)}
+                >
+                  {event.isLive ? "Stop Live" : "Go Live"}
+                </Button>
               <Button
                   variant="contained"
                   color="primary"

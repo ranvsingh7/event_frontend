@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import Logo from "@/../public/new-logo.png"
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -41,7 +42,7 @@ const Navbar = () => {
         {/* Left Section: Logo */}
 
         <Link href="/" className="h-12">
-          <Image src="/logo/logo.png" alt="Logo" width={100} height={100} />
+          <Image src={Logo} alt="Logo" width={100} height={50} className="h-[50px]" />
         </Link>
 
         {/* Middle Section: Navigation Links */}

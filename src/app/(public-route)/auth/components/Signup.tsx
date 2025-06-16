@@ -1,6 +1,6 @@
 import { apiRequest } from '@/utils/api';
 import { SelectChangeEvent, TextField } from '@mui/material';
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface FormDataSignup {
@@ -13,10 +13,10 @@ interface FormDataSignup {
 }
 
 interface SignupProps {
-    onSuccess: ()=> void
+    onSuccess: () => void;
 }
 
-const Signup: React.FC<SignupProps> = ({onSuccess}) => {
+const Signup: React.FC<SignupProps> = ({ onSuccess }) => {
     const [formDataSignup, setFormDataSignup] = useState<FormDataSignup>({
         name: "",
         email: "",
@@ -41,10 +41,8 @@ const Signup: React.FC<SignupProps> = ({onSuccess}) => {
         try {
             const result = await apiRequest<{ message: string }>("/api/auth/signup", "POST", formDataSignup);
             toast.success(result.message);
-            setLoading(false)
-            // setActive(false);
-            onSuccess()
-            // clear form data
+            setLoading(false);
+            onSuccess();
             setFormDataSignup({
                 name: "",
                 email: "",
@@ -58,56 +56,71 @@ const Signup: React.FC<SignupProps> = ({onSuccess}) => {
             setLoading(false);
         }
     };
-  return (
-    <div className="form-box register">
-          <form onSubmit={handleSubmitSignup} >
-                <h1 className="font-semibold">Register</h1>
-                <div className="input-box">
-                <TextField
-                    label="Name"
-                    name="name"
-                    value={formDataSignup.name}
-                    onChange={handleChangeSignup}
-                    fullWidth
-                    required
-                />
-                </div>
-                <div className="input-box">
-                <TextField
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={formDataSignup.email}
-                    onChange={handleChangeSignup}
-                    fullWidth
-                    required
-                />
-                </div>
-                <div className="input-box">
-                <TextField
-                    label="Mobile"
-                    name="mobile"
-                    value={formDataSignup.mobile}
-                    onChange={handleChangeSignup}
-                    fullWidth
-                    required
-                />
-                </div>
-                <div className="input-box">
-                <TextField
-                    label="Password"
-                    name="password"
-                    type="password"
-                    value={formDataSignup.password}
-                    onChange={handleChangeSignup}
-                    fullWidth
-                    required
-                />
-                </div>
-                <button type="submit" disabled={loading} className="btn">Register</button>
-            </form>
-          </div>
-  )
-}
 
-export default Signup
+    return (
+        <div className="flex items-center justify-center rounded-xl bg-gray-100">
+            <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
+                <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Register</h1>
+                <form onSubmit={handleSubmitSignup} className="space-y-4">
+                    <div>
+                        <TextField
+                            label="Name"
+                            name="name"
+                            value={formDataSignup.name}
+                            onChange={handleChangeSignup}
+                            fullWidth
+                            required
+                            className="border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <TextField
+                            label="Email"
+                            name="email"
+                            type="email"
+                            value={formDataSignup.email}
+                            onChange={handleChangeSignup}
+                            fullWidth
+                            required
+                            className="border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <TextField
+                            label="Mobile"
+                            name="mobile"
+                            value={formDataSignup.mobile}
+                            onChange={handleChangeSignup}
+                            fullWidth
+                            required
+                            className="border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    <div>
+                        <TextField
+                            label="Password"
+                            name="password"
+                            type="password"
+                            value={formDataSignup.password}
+                            onChange={handleChangeSignup}
+                            fullWidth
+                            required
+                            className="border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full py-2 px-4 text-white font-semibold rounded-md shadow-md transition ${
+                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                        }`}
+                    >
+                        {loading ? "Registering..." : "Register"}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default Signup;
