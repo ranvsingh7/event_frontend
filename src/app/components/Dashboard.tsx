@@ -21,6 +21,17 @@ import { jwtDecode } from "jwt-decode";
 import Pass from "./Pass";
 import Loading from "./ui/Loading";
 import Link from "next/link";
+import toast from "react-hot-toast";
+
+interface BookingResponse {
+  name: string;
+  email: string;
+  eventName: string;
+  eventDate: string;
+  _id: string;
+  passCount: number;
+}
+
 
 const Dashboard = () => {
   const [events, setEvents] = useState<EventType[]>([]);
@@ -223,40 +234,63 @@ const Dashboard = () => {
   };
 
   const handleBookSave = async () => {
-    const { selectValue, ...bookingData } = bookEventDetails;
-    console.log(selectValue);
-    const token = document.cookie.replace(
-      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-      "$1"
-    )
+  const { selectValue, ...bookingData } = bookEventDetails;
+  console.log(selectValue);
 
-    const paymentDetails={
-      success: true,
-      paymentMode: "cash",
-    }
+  const token = document.cookie.replace(
+    /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+    "$1"
+  );
 
-    const data = {
-      ...bookingData, paymentDetails
-    }
-
-    console.log(data)
-
-    try {
-      setLoading(true);
-      const response = await apiRequest(
-        `/api/bookings/auth/create-booking`,
-        "POST",
-        data,token
-      );
-      setBookDialogOpen(false);
-      setPassDetails(response);
-      setDigitalPassOpen(true);
-    } catch (err: any) {
-      alert(err.message || "Failed to book the pass.");
-    } finally {
-      setLoading(false);
-    }
+  const paymentDetails = {
+    success: true,
+    paymentMode: "cash",
   };
+
+  const data = {
+    ...bookingData,
+    paymentDetails,
+  };
+
+  console.log(data);
+
+  try {
+    setLoading(true);
+
+    // Step 1: Create the booking
+     const response = (await apiRequest(
+      `/api/bookings/auth/create-booking`,
+      "POST",
+      data,
+      token
+    )) as BookingResponse;
+
+    setBookDialogOpen(false);
+    setPassDetails(response);
+    setDigitalPassOpen(true);
+
+    // Step 2: Prepare email details
+    console.log(passDetails)
+    const emailDetails = {
+      userName: response.name,
+      userEmail: response.email,
+      eventName: response.eventName,
+      eventDate: response.eventDate,
+      bookingId: response._id,
+      passCount: response.passCount,
+    };
+
+    // Step 3: Send confirmation email
+    await apiRequest(`/api/email-service`, "POST", emailDetails, token);
+
+    toast.success("Pass Booked and Confirmation Email Sent Successfully!");
+  } catch (err: any) {
+    alert(err.message || "Failed to book the pass.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleLive = (e:EventType)=> {
     // update isLive status of event

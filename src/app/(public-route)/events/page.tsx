@@ -18,6 +18,15 @@ import PublicNav from "../../components/PublicNav";
 import Image from "next/image";
 import Loading from "../../components/ui/Loading";
 
+interface BookingResponse {
+  name: string;
+  email: string;
+  eventName: string;
+  eventDate: string;
+  _id: string;
+  passCount: number;
+}
+
 const Events = () => {
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -106,29 +115,50 @@ const Events = () => {
     }
   };
 console.log(bookEventDetails)
-  const handleBookSave = async (paymentDetails:any) => {
-    const { selectValue, ...bookingData } = bookEventDetails;
-    console.log(selectValue)
-    if(!paymentDetails) return
-    setLoading(true);
-    try {
-      const data = {...bookingData, paymentDetails}
-      const response = await apiRequest(
-        `/api/bookings/create-booking`,
-        "POST",
-        data,
-      );
-      console.log(response)
-      toast.success("Pass Book Successfully")
-      setBookDialogOpen(false);
-      setPassDetails(response);
-      setDigitalPassOpen(true);
-    } catch (err: any) {
-      alert(err.message || "Failed to book the pass.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleBookSave = async (paymentDetails: any) => {
+  const { selectValue, ...bookingData } = bookEventDetails;
+  console.log(selectValue);
+
+  if (!paymentDetails) return;
+  setLoading(true);
+
+  try {
+    // Combine booking and payment details
+    const data = { ...bookingData, paymentDetails };
+
+    // Create the booking
+    const response = await apiRequest(`/api/bookings/create-booking`, "POST", data) as BookingResponse;
+
+    console.log(response);
+
+    // Notify the user of success
+    toast.success("Pass Booked Successfully");
+
+    // Update the UI state
+    setBookDialogOpen(false);
+    setPassDetails(response);
+    setDigitalPassOpen(true);
+
+    // Prepare email details
+    const emailDetails = {
+      userName: response.name,
+      userEmail: response.email,
+      eventName: response.eventName,
+      eventDate: response.eventDate,
+      bookingId: response._id,
+      passCount: response.passCount,
+    };
+
+    // Send an email using the backend API
+    await apiRequest(`/api/email-service`, "POST", emailDetails);
+
+    toast.success("Confirmation Email Sent Successfully");
+  } catch (err: any) {
+    alert(err.message || "Failed to book the pass.");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="w-screen h-screen">
       <img className="absolute inset-0 w-full h-full object-cover" alt="background"  src="https://res.cloudinary.com/dsluib7tj/image/upload/f_auto/q_auto/v1/event-pulse/hero-ticket_j0ccun?_a=DAJCwlWIZAA0" />
