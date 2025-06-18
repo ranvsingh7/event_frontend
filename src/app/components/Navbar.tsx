@@ -9,7 +9,6 @@ import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 import {
   Close,
   ExpandMore,
-  Person,
   Menu as MenuIcon,
 } from "@mui/icons-material";
 
