@@ -46,44 +46,56 @@ const CreateEvent = () => {
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-        // console.log(formData);
-    
-        try {
-            // Retrieve the token from localStorage (or another secure location)
-            const token = document.cookie.replace(
-                /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-                "$1"
-            );
-            if (!token) {
-                throw new Error("You must be logged in to create an event.");
-            }
-    
-            // Use the `apiRequest` function to send the request
-            const response = await apiRequest<{ message: string }>(
-                "/api/events/create-event",
-                "POST",
-                formData,
-                token
-            );
-            // console.log(response)
-            toast.success(response.message)
-            setFormData({
-                name: "",
-                description: "",
-                date: "",
-                location: "",
-                entryTypes: [{ name: "", amount: "", count: "" }],
-            });
-        } catch (err: any) {
-            toast.error(err.message)
-        } finally {
-            setLoading(false);
+    const today = new Date();
+    const selectedDate = new Date(formData.date);
+
+    // Reset time for comparison
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    console.log("Selected Date:", selectedDate);
+    console.log("Today's Date:", today);
+
+    if (selectedDate < today) {
+        toast.error("Event date cannot be in the past.");
+        setLoading(false);
+        return;
+    }
+
+    try {
+        // Retrieve the token from localStorage (or another secure location)
+        const token = document.cookie.replace(
+            /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+            "$1"
+        );
+        if (!token) {
+            throw new Error("You must be logged in to create an event.");
         }
-    };
-    
+
+        // Use the `apiRequest` function to send the request
+        const response = await apiRequest<{ message: string }>(
+            "/api/events/create-event",
+            "POST",
+            formData,
+            token
+        );
+        toast.success(response.message);
+        setFormData({
+            name: "",
+            description: "",
+            date: "",
+            location: "",
+            entryTypes: [{ name: "", amount: "", count: "" }],
+        });
+    } catch (err: any) {
+        toast.error(err.message);
+    } finally {
+        setLoading(false);
+    }
+};
     
 
     return (
@@ -209,7 +221,7 @@ const CreateEvent = () => {
                                 style={{ marginTop: "16px" }}
                                 disabled={loading}
                             >
-                                {loading ? "Creating..." : "Create Event"}
+                                {loading ? "Creatingjkh.." : "Create Event"}
                             </Button>
                         </form>
                     </CardContent>

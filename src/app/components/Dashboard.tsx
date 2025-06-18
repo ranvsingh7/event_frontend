@@ -130,33 +130,46 @@ const Dashboard = () => {
   const handleEditSave = async () => {
     if (!editEvent) return;
 
+    const today = new Date();
+    const selectedDate = new Date(editEvent.date);
+
+    // Reset time for comparison
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+        alert("Event date cannot be in the past.");
+        return;
+    }
+
     const token = document.cookie.replace(
-      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-      "$1"
+        /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+        "$1"
     );
     if (!token) {
-      alert("Authentication token not found. Please log in again.");
-      return;
+        alert("Authentication token not found. Please log in again.");
+        return;
     }
 
     try {
-      const updatedEvent = await apiRequest<EventType>(
-        `/api/events/edit-event/${editEvent._id}`,
-        "PUT",
-        editEvent,
-        token
-      );
-      setEvents((prevEvents) =>
-        prevEvents.map((event) =>
-          event._id === updatedEvent._id ? updatedEvent : event
-        )
-      );
-      alert("Event updated successfully.");
-      handleEditClose();
+        const updatedEvent = await apiRequest<EventType>(
+            `/api/events/edit-event/${editEvent._id}`,
+            "PUT",
+            editEvent,
+            token
+        );
+        setEvents((prevEvents) =>
+            prevEvents.map((event) =>
+                event._id === updatedEvent._id ? updatedEvent : event
+            )
+        );
+        alert("Event updated successfully.");
+        handleEditClose();
     } catch (err: any) {
-      alert(err.message || "Failed to update the event.");
+        alert(err.message || "Failed to update the event.");
     }
-  };
+};
+
 
   const handleInputChange = (field: keyof EventType, value: any) => {
     if (editEvent) {
@@ -304,38 +317,53 @@ const Dashboard = () => {
 };
 
 
-  const handleLive = (e:EventType)=> {
-    // update isLive status of event
+  const handleLive = (e: EventType) => {
+    // Prevent events with past dates from going live
+    const today = new Date();
+    const eventDate = new Date(e.date);
+
+    // Reset time for comparison
+    today.setHours(0, 0, 0, 0);
+    eventDate.setHours(0, 0, 0, 0);
+
+    if (eventDate < today) {
+        alert("The event date is in the past. It cannot go live.");
+        return;
+    }
+
+    // Update isLive status of event
     const token = document.cookie.replace(
-      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-      "$1"
+        /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+        "$1"
     );
     if (!token) {
-      alert("Authentication token not found. Please log in again.");
-      return;
+        alert("Authentication token not found. Please log in again.");
+        return;
     }
-    const updatedEvent = {
-      ...e,
-      isLive: !e.isLive,
-    };
-    apiRequest<EventType>(`/api/events/live-event/${e._id}`, "PUT", updatedEvent, token)
-      .then((data) => {
-        setEvents((prevEvents) =>
-          prevEvents.map((event) =>
-            event._id === data._id ? data : event
-          )
-        );
-        if (data.isLive) {
-          toast.success("Event is now LIVE.");
-        } else {
-          toast.error("Event has been stopped.");
-        }
-      })
-      .catch((err: any) => {
-        alert(err.message || "Failed to update the event status.");
-      });
 
-  }
+    const updatedEvent = {
+        ...e,
+        isLive: !e.isLive,
+    };
+
+    apiRequest<EventType>(`/api/events/live-event/${e._id}`, "PUT", updatedEvent, token)
+        .then((data) => {
+            setEvents((prevEvents) =>
+                prevEvents.map((event) =>
+                    event._id === data._id ? data : event
+                )
+            );
+            if (data.isLive) {
+                toast.success("Event is now LIVE.");
+            } else {
+                toast.error("Event has been stopped.");
+            }
+        })
+        .catch((err: any) => {
+            alert(err.message || "Failed to update the event status.");
+        });
+};
+
 
   return (
     <div className="p-6">

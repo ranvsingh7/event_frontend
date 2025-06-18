@@ -41,6 +41,7 @@ const Events = () => {
     eventDesc: "",
     eventDate: "",
     email: "",
+    isLive: false,
     mobile: "",
     amount: 0,
     entryType: "",
@@ -94,6 +95,7 @@ const Events = () => {
       name: "",
       email: "",
       mobile: "",
+      isLive: event.isLive,
       entryType: "",
       amount:0,
       selectValue: "",
@@ -126,8 +128,13 @@ const Events = () => {
       setBookEventDetails({ ...bookEventDetails, [field]: value });
     }
   };
-console.log(bookEventDetails)
+
   const handleBookSave = async (paymentDetails: any) => {
+    // check if isLive is false then return
+  if (!bookEventDetails.isLive) {
+      toast.error("This event is not live yet.");
+      return;
+    }
   const { selectValue, ...bookingData } = bookEventDetails;
   console.log(selectValue);
 
