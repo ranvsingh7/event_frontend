@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname;
 
-    // Define public paths that anyone can access
+    // Define public paths that anyone can access.
     const isPublicPath =
         path === "/auth" ||
         path === "/contact-us" ||
