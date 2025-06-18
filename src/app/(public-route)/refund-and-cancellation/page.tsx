@@ -1,19 +1,31 @@
+"use client";
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 const RefundAndCancellation = () => {
-  return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white p-6 rounded-2xl shadow-md w-full max-w-4xl">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Cancellation & Refund Policy</h1>
-        <p className="text-sm text-gray-500 mb-6">Last updated on 10-03-2025 17:20:17</p>
+  const router = useRouter(); // Next.js App Router navigation hook
 
-        <div className="space-y-4">
-          <p className="text-gray-600">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex items-center justify-center p-6">
+      <div className="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-4xl space-y-6">
+        <button
+          onClick={() => router.back()} // Use Next.js App Router's back method
+          className="bg-yellow-400 text-black font-semibold px-4 py-2 rounded-md shadow-md hover:bg-yellow-500 transition-all duration-300"
+        >
+          ← Back
+        </button>
+        <div className="text-center">
+          <h1 className="text-4xl font-extrabold mb-2">Cancellation & Refund Policy</h1>
+          <p className="text-sm text-gray-300">Last updated on 10-03-2025 17:20:17</p>
+        </div>
+
+        <div className="space-y-6">
+          <p className="text-gray-300">
             RANVEER believes in helping its customers as far as possible and has therefore a liberal cancellation policy.
             Under this policy:
           </p>
 
-          <ul className="list-disc pl-6 space-y-2 text-gray-600">
+          <ul className="list-disc pl-6 space-y-2 text-gray-300">
             <li>
               Cancellations will be considered only if the request is made immediately after placing the order. However,
               the cancellation request may not be entertained if the orders have been communicated to the vendors/merchants

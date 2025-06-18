@@ -52,7 +52,9 @@ export interface PassData {
     email: string;
     entryType: string;
     date: string;
+    eventDate: string;
     passCount: number;
+    entryTitle: string;
     checkedCount: number;
     remainingCount: number;
   }

@@ -10,6 +10,9 @@ export function middleware(req: NextRequest) {
         path === "/contact-us" ||
         path === "/terms-and-condition" ||
         path === "/refund-and-cancellation" ||
+        path === "/privacy-policy" ||
+        path === "/about" ||
+        path === "/services" ||
         path === "/events" ||
         path === "/";
 

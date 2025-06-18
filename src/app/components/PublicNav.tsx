@@ -84,6 +84,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import Logo from "@/../public/new-logo.png"; // Adjust the path as necessary
 
 const PublicNav = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -97,7 +98,7 @@ const PublicNav = () => {
       {/* Logo Section */}
       <div className="flex items-center space-x-3">
         <Link href="/">
-          <Image src="/logo/logo.png" alt="Logo" width={160} height={60} className="rounded-full" />
+          <Image src={Logo} alt="Logo" width={100} height={100} />
         </Link>
       </div>
 
@@ -140,7 +141,7 @@ const PublicNav = () => {
             <Link href="/services" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
               Services
             </Link>
-            <Link href="/contact" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
+            <Link href="/contact-us" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
               Contact
             </Link>
             <Link href="/auth">
@@ -163,7 +164,7 @@ const PublicNav = () => {
         <Link href="/services" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
           Services
         </Link>
-        <Link href="/contact" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
+        <Link href="/contact-us" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
           Contact
         </Link>
       </div>

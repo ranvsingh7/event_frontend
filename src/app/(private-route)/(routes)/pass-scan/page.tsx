@@ -3,7 +3,7 @@
 import { PassData } from "@/types/types";
 import { apiRequest } from "@/utils/api";
 import { Add, QrCodeScannerOutlined, Remove } from "@mui/icons-material";
-import { Button, Card, CardContent, CircularProgress, Dialog, IconButton, TextField, Typography } from "@mui/material";
+import { Button, Card, CardContent, CircularProgress, Dialog, DialogActions, DialogContent, IconButton, TextField, Typography } from "@mui/material";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { useEffect, useState } from "react";
 
@@ -34,6 +34,7 @@ const PassScan = () => {
     try {
       const response = await apiRequest<PassData>(`/api/bookings/pass/${passId}`, "GET",undefined, token||"");
       setPassData(response);
+      console.log("Pass Data:", response);
     } catch (err: any) {
       setError(err.message || "Failed to fetch pass data.");
     } finally {
@@ -84,9 +85,22 @@ const handleCheckIn = async () => {
     }
 };
 
+const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+    
+        const options: Intl.DateTimeFormatOptions = {
+          weekday: "short",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        };
+    
+        return new Intl.DateTimeFormat("en-US", options).format(date);
+      }
+
     return isClient ? (
         <div className="p-5 w-max m-auto flex flex-col items-center">
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" className="text-green-600" gutterBottom>
         SCAN PASS
       </Typography>
 
@@ -94,57 +108,85 @@ const handleCheckIn = async () => {
         <CircularProgress />
       ) : passData ? (
         <>
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Pass Details</Typography>
-            <Typography variant="body2">Name: {passData.name}</Typography>
-            <Typography variant="body2">Email: {passData.email}</Typography>
-            <Typography variant="body2">Total Entry: {passData.passCount}</Typography>
-            <Typography variant="body2">Checked Entry: {passData.checkedCount}</Typography>
-            <Typography variant="body2">Remaining Entry: {passData.remainingCount}</Typography>
-            <Typography variant="body2">Entry Type: {passData.entryType}</Typography>
-            <Typography variant="body2">
-              Date: {new Date(passData.date).toLocaleString()}
-            </Typography>
-            <Button onClick={handleCheckInDialog}>
-                Check In
-            </Button>
-          </CardContent>
-        </Card>
+        <Card className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md mx-auto">
+  <CardContent className="flex flex-col gap-4">
+    <Typography variant="h5" className="font-bold text-gray-800 border-b pb-2">
+      Pass Details
+    </Typography>
+    <div className="grid grid-cols-2 gap-y-2 text-sm">
+      <Typography className="text-gray-600 font-medium">Name:</Typography>
+      <Typography className="text-gray-800">{passData.name}</Typography>
 
-        <Dialog open={checkInDialog} onClose={() => setCheckInDialog(false)}>
-            <Typography variant="h6">Check In</Typography>
-            <Typography variant="body2">Are you sure you want to check in this pass?</Typography>
-            {/* number input with increment and decrement and mac button  also */}
-            <div className="flex items-center">
-                <IconButton disabled={checkPassCount<=0} onClick={()=>{checkPassCount > 0 &&setCheckPassCount(checkPassCount-1)}}>
-                    <Remove color="error" />
-                </IconButton>
-                <TextField
-                    label="Count"
-                    type="number"
-                    disabled
-                    value={checkPassCount}
-                    onChange={(e) => setCheckPassCount(parseInt(e.target.value))}
-                    className="max-w-[100px]"
-                    margin="normal"
-            />
-                <IconButton disabled={passData.remainingCount <= checkPassCount} onClick={()=>{setCheckPassCount(checkPassCount+1)}}>
-                    <Add color="primary"/>
-                </IconButton>
+      <Typography className="text-gray-600 font-medium">Email:</Typography>
+      <Typography className="text-gray-800">{passData.email}</Typography>
 
-                <Button variant="outlined" color="primary" onClick={()=>{setCheckPassCount(passData.remainingCount)}}>
-                    Max
-                </Button>
-            </div>
+      <Typography className="text-gray-600 font-medium">Total Entry:</Typography>
+      <Typography className="text-gray-800">{passData.passCount}</Typography>
 
-            <Button variant="contained" color="primary" onClick={handleCheckIn}>
-                Confirm
-            </Button>
-            <Button onClick={() => setCheckInDialog(false)}>
-                Cancel
-            </Button>
-        </Dialog>
+      <Typography className="text-gray-600 font-medium">Checked Entry:</Typography>
+      <Typography className="text-gray-800">{passData.checkedCount}</Typography>
+
+      <Typography className="text-gray-600 font-medium">Remaining Entry:</Typography>
+      <Typography className="text-gray-800">{passData.remainingCount}</Typography>
+
+      <Typography className="text-gray-600 font-medium">Entry Type:</Typography>
+      <Typography className="text-gray-800">{passData.entryTitle}</Typography>
+
+      <Typography className="text-gray-600 font-medium">Date:</Typography>
+      <Typography className="text-gray-800">{formatDate(passData.eventDate)}</Typography>
+    </div>
+    <Button
+      onClick={handleCheckInDialog}
+      variant="contained"
+      color="primary"
+      className="w-full mt-4"
+    >
+      Check In
+    </Button>
+  </CardContent>
+</Card>
+
+
+        <Dialog open={checkInDialog} maxWidth="sm" onClose={() => setCheckInDialog(false)}>
+  <DialogContent className="p-6"> {/* Add padding */}
+    <Typography variant="h6">Check In</Typography>
+    <Typography variant="body2" className="mb-4">
+      Are you sure you want to check in this pass?
+    </Typography>
+    <div className="flex items-center gap-2">
+      <IconButton
+        disabled={checkPassCount <= 0}
+        onClick={() => checkPassCount > 0 && setCheckPassCount(checkPassCount - 1)}
+      >
+        <Remove color="error" />
+      </IconButton>
+      <TextField
+        label="Count"
+        type="number"
+        disabled
+        value={checkPassCount}
+        onChange={(e) => setCheckPassCount(parseInt(e.target.value))}
+        className="max-w-[100px]"
+        margin="normal"
+      />
+      <IconButton
+        disabled={passData.remainingCount <= checkPassCount}
+        onClick={() => setCheckPassCount(checkPassCount + 1)}
+      >
+        <Add color="primary" />
+      </IconButton>
+      <Button variant="outlined" color="primary" onClick={() => setCheckPassCount(passData.remainingCount)}>
+        Max
+      </Button>
+    </div>
+  </DialogContent>
+  <DialogActions className="p-4 border-t">
+    <Button variant="contained" color="primary" onClick={handleCheckIn}>
+      Confirm
+    </Button>
+    <Button onClick={() => setCheckInDialog(false)} color="error">Cancel</Button>
+  </DialogActions>
+</Dialog>
         </>
 
       ) : scanPass ? (

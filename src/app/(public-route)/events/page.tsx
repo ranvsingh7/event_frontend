@@ -48,6 +48,19 @@ const Events = () => {
     selectValue: "",
   });
 
+  const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+    
+        const options: Intl.DateTimeFormatOptions = {
+          weekday: "short",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        };
+    
+        return new Intl.DateTimeFormat("en-US", options).format(date);
+      }
+
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -144,7 +157,7 @@ console.log(bookEventDetails)
       userName: response.name,
       userEmail: response.email,
       eventName: response.eventName,
-      eventDate: response.eventDate,
+      eventDate: formatDate(response.eventDate),
       bookingId: response._id,
       passCount: response.passCount,
     };
@@ -174,75 +187,107 @@ console.log(bookEventDetails)
           <p className="text-[46px] font-[900] italic">No Upcoming Events, Stay Tuned.</p>
           <Image src="/logo/coming-soon.jpg" width={400} height={200} alt="logo"/>
         </div>}
+        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center items-start">
           {events.map((event, i)=>(
-            <div className={` ${i%2==0 ? "bg-gray-600" : "bg-gray-500"} ${events.length-1 !== i && "border-b"} text-white p-4 w-full`} key={event._id}>
-              <p className="text-[46px] font-[900] italic">{event.name}</p>
-              <p className="min-[600px]:max-w-[70%]">{event.description}</p>
-              <div className="flex mt-6 justify-between ">
-              <div className="italic font-bold">
-              <p>{new Date(event.date).toLocaleString()}</p>
-              <p>{event.location}</p>
-              </div>
-              <div className="text-right">
-              <p className="font-bold text-[20px]">
-                  Entry Types:
-                </p>
-                {event.entryTypes.map((entryType) => (
-                  <p key={entryType.name} className="italic text-[14px]">
-                    {entryType.name} - ₹{entryType.amount}
-                  </p>
-                ))}
-              </div>
-              </div>
-              <div className="flex justify-center">
-              <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ mt: 2 }}
-                  onClick={() => handleBookOpen(event)}
-                >
-                  BOOK NOW
-                </Button>
-              </div>
-            </div>
+      <div
+  className={`${
+    i % 2 === 0 ? "bg-gradient-to-r from-blue-500 to-blue-600" : "bg-gradient-to-r from-gray-500 to-gray-600"
+  } text-white p-6 rounded-lg shadow-lg w-full`}
+  key={event._id}
+>
+  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div className="w-full md:w-2/3">
+      <p className="text-[24px] md:text-[32px] font-bold">{event.name}</p>
+      <p className="text-sm md:text-base mt-2">{event.description}</p>
+    </div>
+    <div className="w-full md:w-1/3 text-right">
+      <p className="text-sm md:text-base font-semibold">Event Date:</p>
+      <p className="text-sm">{new Date(event.date).toLocaleString()}</p>
+      <p className="text-sm md:text-base font-semibold mt-2">Location:</p>
+      <p className="text-sm">{event.location}</p>
+    </div>
+  </div>
+
+  <div className="mt-4">
+  <p className="font-semibold text-lg mb-2">Entry Types:</p>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {event.entryTypes.map((entryType) => (
+      <div
+        key={entryType.name}
+        className="flex justify-between items-center bg-white text-gray-800 px-4 py-3 rounded-lg shadow"
+      >
+        <span className="font-medium">{entryType.name}</span>
+        <span className="font-bold text-blue-600">₹{entryType.amount}</span>
+      </div>
+    ))}
+  </div>
+</div>
+
+
+  <div className="flex justify-center mt-6">
+    <Button
+      variant="contained"
+      sx={{
+        backgroundColor: "#FFD700", // Gold color for button
+        "&:hover": { backgroundColor: "#FFC107" }, // Slightly darker gold
+        color: "black",
+        fontSize: "1rem",
+        fontWeight: "bold",
+        textTransform: "capitalize",
+        padding: "0.5rem 2rem",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      }}
+      onClick={() => handleBookOpen(event)}
+    >
+      Book Now
+    </Button>
+  </div>
+</div>
+
+
+
+
           ))
           }
+          </div>
           <Dialog
-        open={bookDialogOpen}
-        maxWidth="sm"
-        onClose={() => setBookDialogOpen(false)}
-        style={{padding:"20px"}}
-      >
-        <div className="p-4 max-w-[400px]">
-        <div className="mb-6">
-        <p className="text-[30px] font-bold text-center">Book Pass</p>
-          <p className="text-[18px] font-semibold text-center">{bookEvent?.name}</p>
-          <p className="text-[14px] font-semibold text-center">
-            Location: {bookEvent?.location}
-          </p>
-        </div>
-        <TextField
-          margin="dense"
-          label="Name"
-          fullWidth
-          value={bookEventDetails?.name || ""}
-          onChange={(e) => handleBookInputChange("name", e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          label="Email"
-          fullWidth
-          value={bookEventDetails?.email || ""}
-          onChange={(e) => handleBookInputChange("email", e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          label="Mobile"
-          fullWidth
-          value={bookEventDetails?.mobile || ""}
-          onChange={(e) => handleBookInputChange("mobile", e.target.value)}
-        />
-        <p className="text-xs font-semibold mt-2">Select Entry</p>
+  open={bookDialogOpen}
+  maxWidth="sm"
+  onClose={() => setBookDialogOpen(false)}
+>
+  <div className="p-6 rounded-lg bg-white shadow-xl max-w-md mx-auto">
+    {/* Header Section */}
+    <div className="text-center mb-6">
+      <h2 className="text-2xl font-bold text-gray-800">Book Your Pass</h2>
+      <p className="text-gray-500 mt-2">{bookEvent?.name}</p>
+      <p className="text-sm text-gray-400">{bookEvent?.location}</p>
+    </div>
+
+    {/* Input Fields */}
+    <div className="space-y-4">
+      <TextField
+        label="Name"
+        fullWidth
+        variant="outlined"
+        value={bookEventDetails?.name || ""}
+        onChange={(e) => handleBookInputChange("name", e.target.value)}
+      />
+      <TextField
+        label="Email"
+        fullWidth
+        variant="outlined"
+        value={bookEventDetails?.email || ""}
+        onChange={(e) => handleBookInputChange("email", e.target.value)}
+      />
+      <TextField
+        label="Mobile"
+        fullWidth
+        variant="outlined"
+        value={bookEventDetails?.mobile || ""}
+        onChange={(e) => handleBookInputChange("mobile", e.target.value)}
+      />
+      <div>
+        <p className="text-sm font-semibold text-gray-600 mb-2">Select Entry</p>
         <Select
           fullWidth
           value={bookEventDetails?.selectValue || ""}
@@ -254,14 +299,34 @@ console.log(bookEventDetails)
             </MenuItem>
           ))}
         </Select>
-        <DialogActions>
-          <Button color="secondary" onClick={()=>{
-            setBookDialogOpen(false)
-          }}>Cancel</Button>
-          <PaymentButton amount={amount} paymentSuccess={(value:object)=>{handleBookSave(value)}} customerData={{customer_name: bookEventDetails.name, customer_email:bookEventDetails.email, customer_phone:bookEventDetails.mobile, customer_id:bookEventDetails.mobile}} />
-        </DialogActions>
-        </div>
-      </Dialog>
+      </div>
+    </div>
+
+    {/* Actions */}
+    <div className="flex justify-end items-center mt-6 space-x-4">
+      <Button
+        variant="outlined"
+        color="error"
+        onClick={() => setBookDialogOpen(false)}
+        className="py-2 px-4"
+      >
+        Cancel
+      </Button>
+      <PaymentButton
+        amount={amount}
+        paymentSuccess={(value: object) => handleBookSave(value)}
+        customerData={{
+          customer_name: bookEventDetails.name,
+          customer_email: bookEventDetails.email,
+          customer_phone: bookEventDetails.mobile,
+          customer_id: bookEventDetails.mobile,
+        }}
+        // className="py-2 px-6 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600"
+      />
+    </div>
+  </div>
+</Dialog>
+
           <Pass open={digitalPassOpen} passData={passDetails} dialogClose={()=>{
             setDigitalPassOpen(false);
             setPassDetails(null)

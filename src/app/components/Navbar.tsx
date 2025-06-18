@@ -34,14 +34,14 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`flex items-center justify-between bg-gray-900 p-4 h-max text-[#f96982] shadow-md sticky top-0 z-10 bg-gray-900 ${
+      className={`flex items-center justify-between bg-gray-900 p-4 h-max text-[#f96982] shadow-md sticky top-0 z-[1000] bg-gray-900 ${
         !isMenuOpen && "overflow-hidden"
       }`}
     >
       <div className="flex gap-20">
         {/* Left Section: Logo */}
 
-        <Link href="/" className="h-12">
+        <Link href="/dashboard" className="h-12">
           <Image src={Logo} alt="Logo" width={100} height={50} className="h-[50px]" />
         </Link>
 
@@ -131,13 +131,13 @@ const Navbar = () => {
         <div
           className={`${
             isMenuOpen ? "right-0" : "right-[-300px]"
-          } z-10 absolute top-0 transition-all duration-300 bg-white w-60 h-screen !opacity-100 p-4`}
+          } z-10 absolute top-0 transition-all duration-300 bg-white w-[270px] h-screen !opacity-100 p-4`}
         >
           {/* close button  */}
           <div className="flex justify-between">
             <div className="flex items-center gap-4">
-              <Person />
-              <span className="hidden sm:inline">John Doe</span>
+              {/* <Person />
+              <span className="hidden sm:inline">John Doe</span> */}
             </div>
             <div className="flex justify-end">
               <IconButton
@@ -161,6 +161,15 @@ const Navbar = () => {
             </li>
             <li className="border-b-2 border-transparent mt-2 cursor-pointer">
               <Link href="/pass-scan">Scan Pass</Link>
+            </li>
+            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
+              <Link href="/contact-us">Contact Us</Link>
+            </li>
+            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
+              <Link href="/terms-and-condition">Terms and Condition</Link>
+            </li>
+            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
+              <Link href="/refund-and-cancellation">Refund and Cancellation</Link>
             </li>
           </ul>
           <div className="mt-10 flex justify-center">

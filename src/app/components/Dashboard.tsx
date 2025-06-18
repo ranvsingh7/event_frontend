@@ -53,6 +53,19 @@ const Dashboard = () => {
     selectValue: "",
   });
 
+  const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+    
+        const options: Intl.DateTimeFormatOptions = {
+          weekday: "short",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        };
+    
+        return new Intl.DateTimeFormat("en-US", options).format(date);
+      }
+
   useEffect(() => {
     const token = document.cookie.replace(
       /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
@@ -265,9 +278,7 @@ const Dashboard = () => {
       token
     )) as BookingResponse;
 
-    setBookDialogOpen(false);
     setPassDetails(response);
-    setDigitalPassOpen(true);
 
     // Step 2: Prepare email details
     console.log(passDetails)
@@ -275,15 +286,16 @@ const Dashboard = () => {
       userName: response.name,
       userEmail: response.email,
       eventName: response.eventName,
-      eventDate: response.eventDate,
+      eventDate: formatDate(response.eventDate),
       bookingId: response._id,
       passCount: response.passCount,
     };
 
     // Step 3: Send confirmation email
     await apiRequest(`/api/email-service`, "POST", emailDetails, token);
-
     toast.success("Pass Booked and Confirmation Email Sent Successfully!");
+    setDigitalPassOpen(true);
+    setBookDialogOpen(false);
   } catch (err: any) {
     alert(err.message || "Failed to book the pass.");
   } finally {
@@ -313,7 +325,11 @@ const Dashboard = () => {
             event._id === data._id ? data : event
           )
         );
-        alert(`Event is now ${data.isLive ? "LIVE" : "Stop"}.`);
+        if (data.isLive) {
+          toast.success("Event is now LIVE.");
+        } else {
+          toast.error("Event has been stopped.");
+        }
       })
       .catch((err: any) => {
         alert(err.message || "Failed to update the event status.");
@@ -322,80 +338,145 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="container p-6">
+    <div className="p-6">
       <h1 className="text-white text-[50px] font-bold">My Events</h1>
-        <div>
+        <div className="max-h-[calc(100vh-200px)] overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Loading loading={loading}/>
           {events.length <= 0 && !loading && <div className="bg-[#060a13]  text-white p-4 w-[820px] mt-5 rounded-xl flex flex-col gap-6 items-center">
           <p className="text-[46px] font-[900] italic">No Events Found, <span className="text-[#f96982]"><Link href="/create-event">Create Now!</Link></span></p>
           {/* <Image src="/logo/404.jpg" width={400} height={200} alt="logo"/> */}
         </div>}
           {events.map((event)=>(
-            <div className="bg-[#060a13] text-white p-4 w-[600px] mt-5 rounded-xl relative" key={event._id}>
-                        {
-              event.isLive && (
-                <div className="flex items-center space-x-2 absolute top-4 right-4">
+    //         <div className="bg-[#060a13] text-white p-4 w-[600px] mt-5 rounded-xl relative" key={event._id}>
+    //                     {
+    //           event.isLive && (
+    //             <div className="flex items-center space-x-2 absolute top-4 right-4">
+    //   <div className="relative flex items-center justify-center">
+    //     <div className="absolute inline-flex h-3 w-3 rounded-full bg-red-500 animate-ping"></div>
+    //     <div className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></div>
+    //   </div>
+    //   <span className="text-sm font-medium">Live</span>
+    // </div>
+    //           )
+    //                     }
+    //           <p className="text-[46px] font-[900] italic">{event.name}</p>
+    //           <p className="max-w-[70%]">{event.description}</p>
+    //           <div className="flex mt-6 justify-between ">
+    //           <div className="italic font-bold">
+    //           <p>{new Date(event.date).toLocaleString()}</p>
+    //           <p>{event.location}</p>
+    //           </div>
+    //           <div className="text-right">
+    //           <p className="font-bold text-[20px]">
+    //               Entry Types:
+    //             </p>
+    //             {event.entryTypes.map((entryType) => (
+    //               <p key={entryType.name} className="italic text-[14px]">
+    //                 {entryType.name} - ₹{entryType.amount}
+    //               </p>
+    //             ))}
+    //           </div>
+    //           </div>
+    //           <div className="flex gap-2 justify-center">
+    //           <Button
+    //               variant="contained"
+    //               color={event.isLive ? "error" : "success"}
+    //               sx={{ mt: 2 }}
+    //               onClick={() => handleLive(event)}
+    //             >
+    //               {event.isLive ? "Stop Live" : "Go Live"}
+    //             </Button>
+    //           <Button
+    //               variant="contained"
+    //               color="primary"
+    //               sx={{ mt: 2 }}
+    //               onClick={() => handleBookOpen(event)}
+    //             >
+    //               BOOK NOW
+    //             </Button>
+    //             <Button
+    //               variant="contained"
+    //               color="secondary"
+    //               sx={{ mt: 2 }}
+    //               onClick={() => handleEditOpen(event)}
+    //             >
+    //               Update Event
+    //             </Button>
+    //             <Button
+    //               variant="outlined"
+    //               color="error"
+    //               sx={{ mt: 2 }}
+    //               onClick={() => handleDelete(event._id)}
+    //             >
+    //               Delete Event
+    //             </Button>
+    //           </div>
+    //         </div>
+    <div
+  className="bg-[#060a13] text-white p-4 w-full max-w-[600px] mt-5 rounded-xl relative mx-auto"
+  key={event._id}
+>
+  {event.isLive && (
+    <div className="flex items-center space-x-2 absolute top-4 right-4">
       <div className="relative flex items-center justify-center">
         <div className="absolute inline-flex h-3 w-3 rounded-full bg-red-500 animate-ping"></div>
         <div className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></div>
       </div>
       <span className="text-sm font-medium">Live</span>
     </div>
-              )
-                        }
-              <p className="text-[46px] font-[900] italic">{event.name}</p>
-              <p className="max-w-[70%]">{event.description}</p>
-              <div className="flex mt-6 justify-between ">
-              <div className="italic font-bold">
-              <p>{new Date(event.date).toLocaleString()}</p>
-              <p>{event.location}</p>
-              </div>
-              <div className="text-right">
-              <p className="font-bold text-[20px]">
-                  Entry Types:
-                </p>
-                {event.entryTypes.map((entryType) => (
-                  <p key={entryType.name} className="italic text-[14px]">
-                    {entryType.name} - ₹{entryType.amount}
-                  </p>
-                ))}
-              </div>
-              </div>
-              <div className="flex gap-2 justify-center">
-              <Button
-                  variant="contained"
-                  color={event.isLive ? "error" : "success"}
-                  sx={{ mt: 2 }}
-                  onClick={() => handleLive(event)}
-                >
-                  {event.isLive ? "Stop Live" : "Go Live"}
-                </Button>
-              <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ mt: 2 }}
-                  onClick={() => handleBookOpen(event)}
-                >
-                  BOOK NOW
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  sx={{ mt: 2 }}
-                  onClick={() => handleEditOpen(event)}
-                >
-                  Update Event
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  sx={{ mt: 2 }}
-                  onClick={() => handleDelete(event._id)}
-                >
-                  Delete Event
-                </Button>
-              </div>
-            </div>
+  )}
+  <p className="text-[32px] md:text-[46px] font-[900] italic">{event.name}</p>
+  <p className="text-sm md:text-base max-w-full md:max-w-[70%]">{event.description}</p>
+  <div className="flex flex-col md:flex-row mt-6 justify-between gap-4">
+    <div className="italic font-bold">
+      <p>{new Date(event.date).toLocaleString()}</p>
+      <p>{event.location}</p>
+    </div>
+    <div className="text-right">
+      <p className="font-bold text-[16px] md:text-[20px]">Entry Types:</p>
+      {event.entryTypes.map((entryType) => (
+        <p key={entryType.name} className="italic text-sm md:text-[14px]">
+          {entryType.name} - ₹{entryType.amount}
+        </p>
+      ))}
+    </div>
+  </div>
+  <div className="flex flex-wrap gap-2 mt-6 justify-center">
+    <Button
+      variant="contained"
+      color={event.isLive ? "error" : "success"}
+      className="!text-sm md:!text-base"
+      onClick={() => handleLive(event)}
+    >
+      {event.isLive ? "Stop Live" : "Go Live"}
+    </Button>
+    <Button
+      variant="contained"
+      color="primary"
+      className="!text-sm md:!text-base"
+      onClick={() => handleBookOpen(event)}
+    >
+      BOOK NOW
+    </Button>
+    <Button
+      variant="contained"
+      color="secondary"
+      className="!text-sm md:!text-base"
+      onClick={() => handleEditOpen(event)}
+    >
+      Update Event
+    </Button>
+    <Button
+      variant="outlined"
+      color="error"
+      className="!text-sm md:!text-base"
+      onClick={() => handleDelete(event._id)}
+    >
+      Delete Event
+    </Button>
+  </div>
+</div>
+
           ))
           }
           </div>
@@ -565,7 +646,7 @@ const Dashboard = () => {
         </Select>
         <DialogActions>
           <Button color="secondary" onClick={()=>setBookDialogOpen(false)}>Cancel</Button>
-          <Button color="primary" onClick={handleBookSave}>
+          <Button color="primary" onClick={handleBookSave} loading={loading}>
             Book
           </Button>
         </DialogActions>

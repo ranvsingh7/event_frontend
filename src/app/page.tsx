@@ -168,27 +168,47 @@ import React from "react";
 
 const Home = () => {
   return (
-    <div className="bg-black h-screen flex items-center justify-center">
-      <div className="text-center space-y-4">
-        <Link href="/events">
-          <button
-            type="button"
-            className="bg-pink-500 text-white font-bold py-2 px-4 rounded hover:bg-pink-600"
-          >
-            Explore Events
-          </button>
-        </Link>
-        <Link href="/auth">
-          <button
-            type="button"
-            className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600"
-          >
-            Host Events
-          </button>
-        </Link>
+    <div className="h-screen bg-gradient-to-b from-gray-900 to-black text-white flex items-center justify-center">
+      <div className="text-center max-w-lg space-y-8 p-6">
+        <h1 className="text-5xl font-extrabold">
+          Welcome to <span className="text-yellow-400">Paperless Ticket</span>.
+        </h1>
+        <p className="text-gray-300 text-lg">
+          Seamlessly manage and explore events with our platform. Whether you're here to discover exciting events or host your own, we've got you covered!
+        </p>
+        <div className="flex justify-center space-x-6">
+          <Link href="/events">
+            <button
+              type="button"
+              className="bg-pink-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-pink-600 transition-all duration-200"
+            >
+              Explore Events
+            </button>
+          </Link>
+          <Link href="/auth">
+            <button
+              type="button"
+              className="bg-blue-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-200"
+            >
+              Host Events
+            </button>
+          </Link>
+        </div>
+        <div className="mt-8">
+          <p className="text-gray-400 text-sm">
+            Need help?{" "}
+            <Link href="/contact-us">
+              <span className="text-yellow-400 font-semibold cursor-pointer hover:underline">
+                Contact Support
+              </span>
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Home;
+
+
