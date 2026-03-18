@@ -7,9 +7,18 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 import {
+  AddCircleOutline,
   Close,
+  ContactMail,
+  Dashboard,
+  EventNote,
   ExpandMore,
+  Gavel,
+  Home,
+  Logout,
   Menu as MenuIcon,
+  QrCodeScanner,
+  ReceiptLong,
 } from "@mui/icons-material";
 
 const Navbar = () => {
@@ -31,13 +40,26 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  const primaryLinks = [
+    { href: "/dashboard", label: "Dashboard", icon: <Dashboard fontSize="small" /> },
+    { href: "/create-event", label: "Create Event", icon: <AddCircleOutline fontSize="small" /> },
+    { href: "/bookings", label: "Bookings", icon: <EventNote fontSize="small" /> },
+    { href: "/pass-scan", label: "Scan Pass", icon: <QrCodeScanner fontSize="small" /> },
+  ];
+
+  const moreLinks = [
+    { href: "/contact-us", label: "Contact Us", icon: <ContactMail fontSize="small" /> },
+    { href: "/terms-and-condition", label: "Terms & Condition", icon: <Gavel fontSize="small" /> },
+    { href: "/refund-and-cancellation", label: "Refund & Cancellation", icon: <ReceiptLong fontSize="small" /> },
+  ];
+
   return (
     <nav
-      className={`flex items-center justify-between bg-gray-900 p-4 h-max text-[#f96982] shadow-md sticky top-0 z-[1000] bg-gray-900 ${
+      className={`sticky top-0 z-[1000] flex h-max items-center justify-between border-b border-cyan-300/20 bg-[#0b1220]/95 p-4 text-cyan-100 shadow-md backdrop-blur-md ${
         !isMenuOpen && "overflow-hidden"
       }`}
     >
-      <div className="flex gap-20">
+      <div className="flex items-center gap-6 lg:gap-20">
         {/* Left Section: Logo */}
 
         <Link href="/dashboard" className="h-12">
@@ -45,22 +67,21 @@ const Navbar = () => {
         </Link>
 
         {/* Middle Section: Navigation Links */}
-        <ul className="flex items-center gap-6 text-lg font-semibold max-[880px]:hidden">
-          <li className="border-b-2 border-transparent hover:border-[#f96982] mt-2 cursor-pointer">
-            <Link href="/dashboard">Dashboard</Link>
-          </li>
-          <li className="border-b-2 border-transparent hover:border-[#f96982] mt-2 cursor-pointer">
-            <Link href="/create-event">Create Event</Link>
-          </li>
-          <li className="border-b-2 border-transparent hover:border-[#f96982] mt-2 cursor-pointer">
-            <Link href="/bookings">Bookings</Link>
-          </li>
-          <li className="border-b-2 border-transparent hover:border-[#f96982] mt-2 cursor-pointer">
-            <Link href="/pass-scan">Scan Pass</Link>
-          </li>
+        <ul className="flex items-center gap-4 text-sm font-semibold max-[880px]:hidden">
+          {primaryLinks.map((item) => (
+            <li key={item.href} className="cursor-pointer">
+              <Link
+                href={item.href}
+                className="inline-flex items-center gap-1.5 rounded-full border border-transparent px-3 py-1.5 tracking-[0.08em] text-slate-100 transition-all duration-200 hover:border-cyan-300/50 hover:bg-cyan-400/10 hover:text-cyan-200"
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </Link>
+            </li>
+          ))}
           <div>
             <Button
-            sx={{ textTransform: 'none' }}
+              sx={{ textTransform: "none" }}
               id="basic-button"
               variant="text"
               disableRipple
@@ -70,10 +91,11 @@ const Navbar = () => {
               onClick={handleClick}
               size="large"
               style={{
-                color: "#f96982",
-                marginTop: "6px",
-                fontWeight:600,
-                fontSize:"18px"
+                color: "#cbd5e1",
+                marginTop: "2px",
+                fontWeight: 700,
+                fontSize: "14px",
+                letterSpacing: "0.08em",
               }}
             >
               More <ExpandMore />
@@ -84,13 +106,26 @@ const Navbar = () => {
               anchorEl={anchorEl}
               open={open}
               onClose={handleClose}
+              PaperProps={{
+                sx: {
+                  borderRadius: "14px",
+                  border: "1px solid rgba(6,182,212,0.25)",
+                  background: "linear-gradient(145deg, #0b1220 0%, #15112a 100%)",
+                  color: "#e2e8f0",
+                },
+              }}
               MenuListProps={{
                 "aria-labelledby": "basic-button",
               }}
             >
-              <MenuItem onClick={handleClose}><Link href="/contact-us">Contact Us</Link></MenuItem>
-              <MenuItem onClick={handleClose}><Link href="/terms-and-condition">Terms and Condition</Link></MenuItem>
-              <MenuItem onClick={handleClose}><Link href="/refund-and-cancellation">Refund and Cancellation</Link></MenuItem>
+              {moreLinks.map((item) => (
+                <MenuItem key={item.href} onClick={handleClose}>
+                  <Link href={item.href} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-100">
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </Link>
+                </MenuItem>
+              ))}
             </Menu>
           </div>
         </ul>
@@ -102,6 +137,8 @@ const Navbar = () => {
           <Button
             color="error"
             variant="outlined"
+            startIcon={<Logout fontSize="small" />}
+            className="!rounded-full !border-red-400/60 !px-4 !text-xs !font-semibold !tracking-[0.1em] !text-red-300"
             onClick={() => {
               handleSignOut();
             }}
@@ -130,7 +167,7 @@ const Navbar = () => {
         <div
           className={`${
             isMenuOpen ? "right-0" : "right-[-300px]"
-          } z-10 absolute top-0 transition-all duration-300 bg-white w-[270px] h-screen !opacity-100 p-4`}
+          } z-10 absolute top-0 h-screen w-[290px] bg-gradient-to-b from-[#0b1220] to-[#15112a] p-4 !opacity-100 transition-all duration-300`}
         >
           {/* close button  */}
           <div className="flex justify-between">
@@ -147,34 +184,36 @@ const Navbar = () => {
               </IconButton>
             </div>
           </div>
-          <hr className="my-4" />
-          <ul className="text-xl font-semibold text-blue-500">
-            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
-              <Link href="/">Home</Link>
+          <hr className="my-4 border-cyan-200/20" />
+          <ul className="space-y-2 text-sm font-semibold text-slate-100">
+            <li className="cursor-pointer">
+              <Link href="/" className="inline-flex w-full items-center gap-2 rounded-xl px-2 py-2 tracking-[0.08em] hover:bg-cyan-400/10" onClick={() => setIsMenuOpen(false)}>
+                <Home fontSize="small" /> Home
+              </Link>
             </li>
-            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
-              <Link href="/create-event">Create Event</Link>
-            </li>
-            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
-              <Link href="/bookings">Bookings</Link>
-            </li>
-            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
-              <Link href="/pass-scan">Scan Pass</Link>
-            </li>
-            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
-              <Link href="/contact-us">Contact Us</Link>
-            </li>
-            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
-              <Link href="/terms-and-condition">Terms and Condition</Link>
-            </li>
-            <li className="border-b-2 border-transparent mt-2 cursor-pointer">
-              <Link href="/refund-and-cancellation">Refund and Cancellation</Link>
-            </li>
+            {primaryLinks
+              .filter((item) => item.href !== "/dashboard")
+              .map((item) => (
+                <li key={item.href} className="cursor-pointer">
+                  <Link href={item.href} className="inline-flex w-full items-center gap-2 rounded-xl px-2 py-2 tracking-[0.08em] hover:bg-cyan-400/10" onClick={() => setIsMenuOpen(false)}>
+                    {item.icon} {item.label}
+                  </Link>
+                </li>
+              ))}
+            {moreLinks.map((item) => (
+              <li key={item.href} className="cursor-pointer">
+                <Link href={item.href} className="inline-flex w-full items-center gap-2 rounded-xl px-2 py-2 tracking-[0.08em] hover:bg-cyan-400/10" onClick={() => setIsMenuOpen(false)}>
+                  {item.icon} {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
           <div className="mt-10 flex justify-center">
             <Button
               color="error"
               variant="outlined"
+              startIcon={<Logout fontSize="small" />}
+              className="!rounded-full !border-red-400/60 !px-4 !text-xs !font-semibold !tracking-[0.1em] !text-red-300"
               onClick={() => {
                 // remove token from cookies and redirect to signin page
                 handleSignOut();

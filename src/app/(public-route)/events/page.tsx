@@ -3,9 +3,6 @@
 import {
   Button,
   Dialog,
-  MenuItem,
-  Select,
-  TextField,
 } from "@mui/material";
 import React, {  useEffect,  useState } from "react";
 import { Event as EventType } from "../../../types/types";
@@ -16,6 +13,8 @@ import toast from "react-hot-toast";
 import PublicNav from "../../components/PublicNav";
 import Image from "next/image";
 import Loading from "../../components/ui/Loading";
+import CustomInput from "../../components/CustomInput";
+import CustomSelect from "../../components/CustomSelect";
 
 interface BookingResponse {
   name: string;
@@ -109,7 +108,7 @@ const Events = () => {
     // console.log(value, field);
     if (field === "selectValue") {
       const entryType = bookEvent?.entryTypes.find(
-        (entryType) => entryType.name === value
+        (entryType) => entryType._id === value || entryType.name === value
       );
       console.log(entryType);
       // console.log(value)
@@ -173,80 +172,95 @@ const Events = () => {
 
     toast.success("Confirmation Email Sent Successfully");
   } catch (err: any) {
-    alert(err.message || "Failed to book the pass.");
+    toast.error(err.message || "Failed to book the pass.");
   } finally {
     setLoading(false);
   }
 };
   return (
-    <div className="w-screen h-screen">
-      <img className="absolute inset-0 w-full h-full object-cover" alt="background"  src="https://res.cloudinary.com/dsluib7tj/image/upload/f_auto/q_auto/v1/event-pulse/hero-ticket_j0ccun?_a=DAJCwlWIZAA0" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-blue-900/70"></div>
-      <div className="absolute inset-0">
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#060a15]">
+      <img
+        className="absolute inset-0 h-full w-full object-cover"
+        alt="background"
+        src="https://res.cloudinary.com/dsluib7tj/image/upload/f_auto/q_auto/v1/event-pulse/hero-ticket_j0ccun?_a=DAJCwlWIZAA0"
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#02040b]/95 via-[#060a15]/90 to-[#0f172a]/85"></div>
+      <div className="relative z-10 min-h-screen">
       <PublicNav />
 
-      <div className="px-10 min-[850px]:pt-[50px] pb-10 overflow-auto h-[90vh]">
-        <h1 className="text-pink-600 min-[850px]:pb-4 text-center text-[56px] font-semibold">Ongoing Events</h1>
+      <div className="mx-auto h-[90vh] w-full max-w-7xl overflow-auto px-4 pb-10 pt-6 sm:px-6 lg:px-8 lg:pt-10">
+        <div className="mb-8 text-center">
+          <p className="inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-cyan-100">
+            LIVE EXPERIENCES
+          </p>
+          <h1 className="mt-3 bg-gradient-to-r from-white via-cyan-200 to-fuchsia-200 bg-clip-text text-4xl font-black tracking-tight text-transparent sm:text-6xl">
+            Ongoing Events
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-300 sm:text-base">
+            Discover handpicked live events, choose your preferred entry type, and book instantly.
+          </p>
+        </div>
+
         <div>
           <Loading loading={loading}/>
-          {events.length <= 0 && !loading && <div className="bg-[#060a13]  text-white p-4 w-full min-[1024px]:w-[820px] mt-5 rounded-xl flex flex-col gap-6 items-center">
-          <p className="text-[46px] font-[900] italic">No Upcoming Events, Stay Tuned.</p>
-          <Image src="/logo/coming-soon.jpg" width={400} height={200} alt="logo"/>
+          {events.length <= 0 && !loading && <div className="mt-5 flex w-full flex-col items-center gap-6 rounded-2xl border border-white/15 bg-black/25 p-6 text-white backdrop-blur-sm">
+          <p className="text-center text-2xl font-black sm:text-4xl">No Upcoming Events, Stay Tuned.</p>
+          <Image src="/logo/coming-soon.jpg" width={400} height={200} alt="logo" className="rounded-xl"/>
         </div>}
-        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center items-start">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {events.map((event, i)=>(
       <div
-  className={`${
-    i % 2 === 0 ? "bg-gradient-to-r from-blue-500 to-blue-600" : "bg-gradient-to-r from-gray-500 to-gray-600"
-  } text-white p-6 rounded-lg shadow-lg w-full`}
+  className="group relative flex h-full w-full overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-[#0b1220] via-[#101a2f] to-[#1a1230] p-6 text-white shadow-[0_20px_60px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_25px_80px_rgba(6,182,212,0.22)]"
   key={event._id}
 >
-  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-    <div className="w-full md:w-2/3">
-      <p className="text-[24px] md:text-[32px] font-bold">{event.name}</p>
-      <p className="text-sm md:text-base mt-2">{event.description}</p>
-    </div>
-    <div className="w-full md:w-1/3 text-right">
-      <p className="text-sm md:text-base font-semibold">Event Date:</p>
-      <p className="text-sm">{new Date(event.date).toLocaleString()}</p>
-      <p className="text-sm md:text-base font-semibold mt-2">Location:</p>
-      <p className="text-sm">{event.location}</p>
-    </div>
+  <div className="pointer-events-none absolute inset-0">
+    <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-fuchsia-500/20 blur-3xl" />
+    <div className="absolute -left-14 bottom-0 h-36 w-36 rounded-full bg-cyan-400/15 blur-3xl" />
   </div>
 
-  <div className="mt-4">
-  <p className="font-semibold text-lg mb-2">Entry Types:</p>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {event.entryTypes.map((entryType) => (
-      <div
-        key={entryType.name}
-        className="flex justify-between items-center bg-white text-gray-800 px-4 py-3 rounded-lg shadow"
-      >
-        <span className="font-medium">{entryType.name}</span>
-        <span className="font-bold text-blue-600">₹{entryType.amount}</span>
+  <div className="relative z-10 flex w-full flex-col">
+    <div className="flex h-full flex-col gap-5">
+      <div>
+        <p className="text-2xl font-extrabold tracking-tight sm:text-3xl">{event.name}</p>
+        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-300">{event.description}</p>
       </div>
-    ))}
-  </div>
-</div>
 
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="rounded-xl bg-white/[0.05] px-3 py-2">
+          <p className="text-xs uppercase tracking-[0.12em] text-slate-400">Event Date</p>
+          <p className="mt-1 text-sm font-semibold text-cyan-100">{formatDate(event.date)}</p>
+        </div>
+        <div className="rounded-xl bg-white/[0.05] px-3 py-2">
+          <p className="text-xs uppercase tracking-[0.12em] text-slate-400">Location</p>
+          <p className="mt-1 text-sm font-semibold text-slate-100">{event.location}</p>
+        </div>
+      </div>
 
-  <div className="flex justify-center mt-6">
-    <Button
-      variant="contained"
-      sx={{
-        backgroundColor: "#FFD700", // Gold color for button
-        "&:hover": { backgroundColor: "#FFC107" }, // Slightly darker gold
-        color: "black",
-        fontSize: "1rem",
-        fontWeight: "bold",
-        textTransform: "capitalize",
-        padding: "0.5rem 2rem",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-      }}
-      onClick={() => handleBookOpen(event)}
-    >
-      Book Now
-    </Button>
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-fuchsia-200">Entry Types</p>
+        <div className="grid grid-cols-1 gap-2">
+          {event.entryTypes.map((entryType) => (
+            <div
+              key={entryType.name}
+              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2"
+            >
+              <span className="text-sm font-medium text-slate-100">{entryType.name}</span>
+              <span className="rounded-full bg-cyan-500/15 px-2 py-0.5 text-sm font-bold text-cyan-200">₹{entryType.amount}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-auto pt-1">
+        <Button
+          variant="contained"
+          onClick={() => handleBookOpen(event)}
+          className="!w-full !rounded-full !bg-gradient-to-r !from-cyan-500 !to-sky-600 !py-2.5 !text-sm !font-semibold !tracking-[0.08em] !text-white"
+        >
+          Book Now
+        </Button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -258,63 +272,66 @@ const Events = () => {
           </div>
           <Dialog
   open={bookDialogOpen}
-  maxWidth="sm"
+  maxWidth={false}
+  fullWidth
   onClose={() => setBookDialogOpen(false)}
+  PaperProps={{
+    sx: {
+      borderRadius: 3,
+      background: "linear-gradient(145deg, #0b1220 0%, #15112a 100%)",
+      color: "#fff",
+      border: "1px solid rgba(255,255,255,0.12)",
+      width: "min(560px, 92vw)",
+      maxWidth: "560px",
+    },
+  }}
 >
-  <div className="p-6 rounded-lg bg-white shadow-xl max-w-md mx-auto">
+  <div className="w-full p-6 text-white sm:p-8">
     {/* Header Section */}
-    <div className="text-center mb-6">
-      <h2 className="text-2xl font-bold text-gray-800">Book Your Pass</h2>
-      <p className="text-gray-500 mt-2">{bookEvent?.name}</p>
-      <p className="text-sm text-gray-400">{bookEvent?.location}</p>
+    <div className="mb-7 text-center">
+      <h2 className="text-3xl font-extrabold tracking-tight">Book Your Pass</h2>
+      <p className="mt-2 text-base font-semibold text-cyan-100">{bookEvent?.name}</p>
+      <p className="text-sm text-slate-300">{bookEvent?.location}</p>
     </div>
 
     {/* Input Fields */}
-    <div className="space-y-4">
-      <TextField
+    <div className="space-y-5">
+      <CustomInput
         label="Name"
-        fullWidth
-        variant="outlined"
         value={bookEventDetails?.name || ""}
         onChange={(e) => handleBookInputChange("name", e.target.value)}
       />
-      <TextField
+      <CustomInput
         label="Email"
-        fullWidth
-        variant="outlined"
+        type="email"
         value={bookEventDetails?.email || ""}
         onChange={(e) => handleBookInputChange("email", e.target.value)}
       />
-      <TextField
+      <CustomInput
         label="Mobile"
-        fullWidth
-        variant="outlined"
+        type="tel"
         value={bookEventDetails?.mobile || ""}
         onChange={(e) => handleBookInputChange("mobile", e.target.value)}
       />
-      <div>
-        <p className="text-sm font-semibold text-gray-600 mb-2">Select Entry</p>
-        <Select
-          fullWidth
-          value={bookEventDetails?.selectValue || ""}
-          onChange={(e) => handleBookInputChange("selectValue", e.target.value)}
-        >
-          {bookEvent?.entryTypes.map((entryType) => (
-            <MenuItem key={entryType.name} value={entryType.name}>
-              {entryType.name} - ₹{entryType.amount}
-            </MenuItem>
-          ))}
-        </Select>
-      </div>
+      <CustomSelect
+        label="Select Entry"
+        value={bookEventDetails?.selectValue || ""}
+        onChange={(e) => handleBookInputChange("selectValue", e.target.value)}
+        placeholder="Choose entry type"
+        options={
+          bookEvent?.entryTypes.map((entryType) => ({
+            value: entryType._id || entryType.name,
+            label: `${entryType.name} - ₹${entryType.amount}`,
+          })) || []
+        }
+      />
     </div>
 
     {/* Actions */}
-    <div className="flex justify-end items-center mt-6 space-x-4">
+    <div className="mt-8 flex flex-wrap items-center justify-end gap-3">
       <Button
-        variant="outlined"
-        color="error"
         onClick={() => setBookDialogOpen(false)}
-        className="py-2 px-4"
+        className="!rounded-full !bg-slate-600 !px-4 !py-2.5 !text-white hover:!bg-slate-500"
       >
         Cancel
       </Button>

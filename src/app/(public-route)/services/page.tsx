@@ -1,10 +1,19 @@
 "use client";
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 const Services = () => {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex items-center justify-center p-6">
       <div className="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-4xl space-y-6">
+        <button
+          onClick={() => router.back()}
+          className="bg-yellow-400 text-black font-semibold px-4 py-2 rounded-md shadow-md hover:bg-yellow-500 transition-all duration-300"
+        >
+          ← Back
+        </button>
         <div className="text-center">
           <h1 className="text-4xl font-extrabold mb-4">Our Services</h1>
           <p className="text-sm text-gray-300">Updated on 10-03-2025 17:30:15</p>

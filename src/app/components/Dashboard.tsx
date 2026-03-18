@@ -2,17 +2,11 @@
 
 import { useEffect, useState } from "react";
 import {
-  Typography,
-  Grid,
   Button,
-  TextField,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import { CustomJwtPayload, Event as EventType } from "../../types/types";
 import { apiRequest } from "@/utils/api";
@@ -22,6 +16,8 @@ import Pass from "./Pass";
 import Loading from "./ui/Loading";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import CustomInput from "./CustomInput";
+import CustomSelect from "./CustomSelect";
 
 interface BookingResponse {
   name: string;
@@ -52,6 +48,8 @@ const Dashboard = () => {
     entryType: "",
     selectValue: "",
   });
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<boolean>(false);
+  const [eventToDelete, setEventToDelete] = useState<string | null>(null);
 
   const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -96,24 +94,35 @@ const Dashboard = () => {
     fetchEvents();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this event?")) return;
+  const handleDeleteClick = (id: string) => {
+    setEventToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!eventToDelete) return;
 
     const token = document.cookie.replace(
       /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
       "$1"
     );
     if (!token) {
-      alert("Authentication token not found. Please log in again.");
+      toast.error("Authentication token not found. Please log in again.");
+      setDeleteConfirmOpen(false);
+      setEventToDelete(null);
       return;
     }
 
     try {
-      await apiRequest(`/api/events/${id}`, "DELETE", undefined, token);
-      setEvents((prevEvents) => prevEvents.filter((event) => event._id !== id));
-      alert("Event deleted successfully.");
+      await apiRequest(`/api/events/${eventToDelete}`, "DELETE", undefined, token);
+      setEvents((prevEvents) => prevEvents.filter((event) => event._id !== eventToDelete));
+      toast.success("Event deleted successfully.");
+      setDeleteConfirmOpen(false);
+      setEventToDelete(null);
     } catch (err: any) {
-      alert(err.message || "Failed to delete the event.");
+      toast.error(err.message || "Failed to delete the event.");
+      setDeleteConfirmOpen(false);
+      setEventToDelete(null);
     }
   };
 
@@ -138,8 +147,8 @@ const Dashboard = () => {
     selectedDate.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
-        alert("Event date cannot be in the past.");
-        return;
+      toast.error("Event date cannot be in the past.");
+      return;
     }
 
     const token = document.cookie.replace(
@@ -147,8 +156,8 @@ const Dashboard = () => {
         "$1"
     );
     if (!token) {
-        alert("Authentication token not found. Please log in again.");
-        return;
+      toast.error("Authentication token not found. Please log in again.");
+      return;
     }
 
     try {
@@ -163,10 +172,10 @@ const Dashboard = () => {
                 event._id === updatedEvent._id ? updatedEvent : event
             )
         );
-        alert("Event updated successfully.");
+        toast.success("Event updated successfully.");
         handleEditClose();
     } catch (err: any) {
-        alert(err.message || "Failed to update the event.");
+        toast.error(err.message || "Failed to update the event.");
     }
 };
 
@@ -241,17 +250,15 @@ const Dashboard = () => {
   ) => {
     // console.log(value, field);
     if (field === "selectValue") {
-      const entryType = bookEvent?.entryTypes.find(
-        (entryType) => entryType.name === value
+      const selectedEntry = bookEvent?.entryTypes.find(
+        (entryType) => entryType._id === value || entryType.name === value
       );
-      console.log(entryType);
-      if (entryType?._id) {
-        setBookEventDetails({
-          ...bookEventDetails,
-          entryType: entryType._id,
-          selectValue: value,
-        });
-      }
+
+      setBookEventDetails((prev) => ({
+        ...prev,
+        entryType: selectedEntry?._id || value,
+        selectValue: value,
+      }));
       return;
     }
     if (bookEventDetails) {
@@ -310,7 +317,7 @@ const Dashboard = () => {
     setDigitalPassOpen(true);
     setBookDialogOpen(false);
   } catch (err: any) {
-    alert(err.message || "Failed to book the pass.");
+    toast.error(err.message || "Failed to book the pass.");
   } finally {
     setLoading(false);
   }
@@ -327,8 +334,8 @@ const Dashboard = () => {
     eventDate.setHours(0, 0, 0, 0);
 
     if (eventDate < today) {
-        alert("The event date is in the past. It cannot go live.");
-        return;
+      toast.error("The event date is in the past. It cannot go live.");
+      return;
     }
 
     // Update isLive status of event
@@ -337,8 +344,8 @@ const Dashboard = () => {
         "$1"
     );
     if (!token) {
-        alert("Authentication token not found. Please log in again.");
-        return;
+      toast.error("Authentication token not found. Please log in again.");
+      return;
     }
 
     const updatedEvent = {
@@ -360,18 +367,25 @@ const Dashboard = () => {
             }
         })
         .catch((err: any) => {
-            alert(err.message || "Failed to update the event status.");
+          toast.error(err.message || "Failed to update the event status.");
         });
 };
 
 
   return (
-    <div className="p-6">
-      <h1 className="text-white text-[50px] font-bold">My Events</h1>
-        <div className="max-h-[calc(100vh-200px)] overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#060a15] via-[#0b1220] to-[#1a1230] p-4 pb-6 sm:p-6">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-medium tracking-[0.18em] text-cyan-100">
+            EVENT MANAGEMENT DASHBOARD
+          </p>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-white sm:text-5xl">My Events</h1>
+        </div>
+      </div>
+        <div className="flex flex-col gap-4 overflow-visible pb-3 md:max-h-[calc(100vh-200px)] md:overflow-y-auto md:pb-0 md:pr-1">
           <Loading loading={loading}/>
-          {events.length <= 0 && !loading && <div className="bg-[#060a13]  text-white p-4 w-[820px] mt-5 rounded-xl flex flex-col gap-6 items-center">
-          <p className="text-[46px] font-[900] italic">No Events Found, <span className="text-[#f96982]"><Link href="/create-event">Create Now!</Link></span></p>
+          {events.length <= 0 && !loading && <div className="mt-5 flex w-full flex-col items-center gap-6 rounded-2xl border border-white/15 bg-black/25 p-6 text-white backdrop-blur-sm md:col-span-2 lg:col-span-3">
+          <p className="text-center text-2xl font-black italic sm:text-4xl">No Events Found, <span className="bg-gradient-to-r from-cyan-300 to-fuchsia-300 bg-clip-text text-transparent"><Link href="/create-event">Create Now!</Link></span></p>
           {/* <Image src="/logo/404.jpg" width={400} height={200} alt="logo"/> */}
         </div>}
           {events.map((event)=>(
@@ -441,69 +455,99 @@ const Dashboard = () => {
     //           </div>
     //         </div>
     <div
-  className="bg-[#060a13] text-white p-4 w-full max-w-[600px] mt-5 rounded-xl relative mx-auto"
-  key={event._id}
->
-  {event.isLive && (
-    <div className="flex items-center space-x-2 absolute top-4 right-4">
-      <div className="relative flex items-center justify-center">
-        <div className="absolute inline-flex h-3 w-3 rounded-full bg-red-500 animate-ping"></div>
-        <div className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></div>
+      className="relative flex w-full items-center overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-[#0b1220] via-[#101a2f] to-[#1a1230] px-4 py-4 text-white shadow-[0_20px_60px_rgba(0,0,0,0.45)] sm:px-6 sm:py-5"
+      key={event._id}
+    >
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-fuchsia-500/20 blur-3xl" />
+        <div className="absolute -left-14 bottom-0 h-36 w-36 rounded-full bg-cyan-400/15 blur-3xl" />
       </div>
-      <span className="text-sm font-medium">Live</span>
+      
+      <div className="relative z-10 flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+        <div className="w-full min-w-0">
+          {/* Event Name & Live Badge */}
+          <div className="flex w-full items-start justify-between gap-3 lg:items-center">
+            <p className="break-words text-lg font-extrabold text-white sm:text-xl">{event.name}</p>
+            {event.isLive && (
+              <div className="inline-flex shrink-0 self-start items-center space-x-1 rounded-full border border-red-400/30 bg-red-500/10 px-2 py-0.5 lg:self-center">
+                <div className="relative flex items-center justify-center">
+                  <div className="absolute inline-flex h-2 w-2 rounded-full bg-red-500 animate-ping"></div>
+                  <div className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></div>
+                </div>
+                <span className="text-xs font-medium">Live</span>
+              </div>
+            )}
+          </div>
+
+          {/* Description */}
+          <p className="mt-2 break-words text-sm text-slate-300 lg:max-w-[420px]">{event.description}</p>
+
+          {/* Meta */}
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-start lg:gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Date</p>
+              <p className="mt-0.5 text-sm font-semibold text-slate-100">{new Date(event.date).toLocaleDateString()}</p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Venue</p>
+              <p className="mt-0.5 break-words text-sm font-semibold text-cyan-200">{event.location}</p>
+            </div>
+
+            <div className="sm:col-span-2 lg:col-span-1">
+              <p className="text-xs uppercase tracking-[0.14em] text-fuchsia-200">Entry Types</p>
+              <div className="mt-0.5 text-xs font-medium text-slate-200">
+                {event.entryTypes.map((et, i) => (
+                  <p key={et.name} className={i > 0 ? "mt-0.5" : ""}>
+                    {et.name} - ₹{et.amount}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end lg:w-auto lg:grid-cols-none lg:flex-nowrap">
+          <Button
+            variant="contained"
+            color={event.isLive ? "error" : "success"}
+            className={`!rounded-full !px-3 !py-1.5 !text-xs !font-semibold ${
+              event.isLive
+                ? "!bg-gradient-to-r !from-red-500 !to-rose-600"
+                : "!bg-gradient-to-r !from-emerald-500 !to-green-600"
+            }`}
+            onClick={() => handleLive(event)}
+          >
+            {event.isLive ? "Stop" : "Live"}
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            className="!rounded-full !bg-gradient-to-r !from-cyan-500 !to-sky-600 !px-3 !py-1.5 !text-xs !font-semibold"
+            onClick={() => handleBookOpen(event)}
+          >
+            Book
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            className="!rounded-full !bg-gradient-to-r !from-amber-500 !to-orange-600 !px-3 !py-1.5 !text-xs !font-semibold"
+            onClick={() => handleEditOpen(event)}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            className="!rounded-full !border-red-400/70 !px-3 !py-1.5 !text-xs !font-semibold !text-red-300"
+            onClick={() => handleDeleteClick(event._id)}
+          >
+            Delete
+          </Button>
+        </div>
+      </div>
     </div>
-  )}
-  <p className="text-[32px] md:text-[46px] font-[900] italic">{event.name}</p>
-  <p className="text-sm md:text-base max-w-full md:max-w-[70%]">{event.description}</p>
-  <div className="flex flex-col md:flex-row mt-6 justify-between gap-4">
-    <div className="italic font-bold">
-      <p>{new Date(event.date).toLocaleString()}</p>
-      <p>{event.location}</p>
-    </div>
-    <div className="text-right">
-      <p className="font-bold text-[16px] md:text-[20px]">Entry Types:</p>
-      {event.entryTypes.map((entryType) => (
-        <p key={entryType.name} className="italic text-sm md:text-[14px]">
-          {entryType.name} - ₹{entryType.amount}
-        </p>
-      ))}
-    </div>
-  </div>
-  <div className="flex flex-wrap gap-2 mt-6 justify-center">
-    <Button
-      variant="contained"
-      color={event.isLive ? "error" : "success"}
-      className="!text-sm md:!text-base"
-      onClick={() => handleLive(event)}
-    >
-      {event.isLive ? "Stop Live" : "Go Live"}
-    </Button>
-    <Button
-      variant="contained"
-      color="primary"
-      className="!text-sm md:!text-base"
-      onClick={() => handleBookOpen(event)}
-    >
-      BOOK NOW
-    </Button>
-    <Button
-      variant="contained"
-      color="secondary"
-      className="!text-sm md:!text-base"
-      onClick={() => handleEditOpen(event)}
-    >
-      Update Event
-    </Button>
-    <Button
-      variant="outlined"
-      color="error"
-      className="!text-sm md:!text-base"
-      onClick={() => handleDelete(event._id)}
-    >
-      Delete Event
-    </Button>
-  </div>
-</div>
 
           ))
           }
@@ -512,172 +556,223 @@ const Dashboard = () => {
       <Dialog
         open={editDialogOpen}
         onClose={handleEditClose}
-        maxWidth="sm"
+        maxWidth={false}
         fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background: "linear-gradient(145deg, #0b1220 0%, #15112a 100%)",
+            color: "#fff",
+            border: "1px solid rgba(255,255,255,0.12)",
+            width: "min(760px, 94vw)",
+            maxWidth: "760px",
+          },
+        }}
       >
-        <DialogTitle>Edit Event</DialogTitle>
-        <Button onClick={()=>setDemoPassOpen(true)}>Show Demo Pass</Button>
-                        <Pass open={demoPassOpen} dialogClose={()=>{setDemoPassOpen(false)}} passData={{
-                            eventName: editEvent?.name,
-                            eventDesc: editEvent?.description
-                        }} demoPass />
-        <DialogContent>
-          <TextField
-            margin="dense"
-            label="Name"
-            fullWidth
-            value={editEvent?.name || ""}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Description"
-            fullWidth
-            value={editEvent?.description || ""}
-            onChange={(e) => handleInputChange("description", e.target.value)}
-            multiline
-            rows={6}
-          />
-          <TextField
-            margin="dense"
-            label="Date"
-            type="date"
-            fullWidth
-            value={
-              editEvent?.date
-                ? new Date(editEvent.date).toISOString().slice(0, 10) // Format to "yyyy-MM-dd"
-                : "" // Empty if no date is set
-            }
-            onChange={(e) => handleInputChange("date", e.target.value)} // Handle changes
-          />
+        <div className="w-full p-6 text-white sm:p-8">
+          <div className="mb-6 sm:mb-8">
+            <p className="text-center text-[28px] font-extrabold tracking-tight">Edit Event</p>
+            <p className="text-center text-sm font-semibold text-cyan-100 sm:text-base">{editEvent?.name}</p>
+          </div>
 
-          <TextField
-            margin="dense"
-            label="Location"
-            fullWidth
-            value={editEvent?.location || ""}
-            onChange={(e) => handleInputChange("location", e.target.value)}
-          />
-
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Entry Types
-          </Typography>
-          {editEvent?.entryTypes.map((entryType, index) => (
-            <Grid container spacing={2} alignItems="center" style={{marginTop: "4px"}} key={index}>
-              <Grid item xs={4}>
-                <TextField
-                  label="Name"
-                  fullWidth
-                  value={entryType.name}
-                  onChange={(e) =>
-                    handleEntryTypeChange(index, "name", e.target.value)
-                  }
-                />
-              </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  label="Amount"
-                  type="number"
-                  fullWidth
-                  value={entryType.amount}
-                  onChange={(e) =>
-                    handleEntryTypeChange(index, "amount", e.target.value)
-                  }
-                />
-              </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  label="Count"
-                  type="number"
-                  fullWidth
-                  value={entryType.count}
-                  onChange={(e) =>
-                    handleEntryTypeChange(index, "count", e.target.value)
-                  }
-                />
-              </Grid>
-              <Grid item xs={2}>
-                <IconButton
-                  color="error"
-                  onClick={() => removeEntryType(index)}
-                >
-                  <Remove />
-                </IconButton>
-              </Grid>
-            </Grid>
-          ))}
           <Button
-            variant="outlined"
-            color="success"
-            sx={{ mt: 2 }}
-            onClick={addEntryType}
+            className="!mb-5 !w-fit !rounded-full !bg-gradient-to-r !from-cyan-500 !to-sky-600 !px-4 !text-white"
+            onClick={() => setDemoPassOpen(true)}
           >
-            <Add /> Add Entry Type
+            Show Demo Pass
           </Button>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleEditClose} color="warning">
-            Cancel
-          </Button>
-          <Button onClick={handleEditSave} color="primary">
-            Save
-          </Button>
-        </DialogActions>
+
+          <Pass
+            open={demoPassOpen}
+            dialogClose={() => {
+              setDemoPassOpen(false);
+            }}
+            passData={{
+              eventName: editEvent?.name,
+              eventDesc: editEvent?.description,
+            }}
+            demoPass
+          />
+
+          <div className="space-y-5">
+            <CustomInput
+              label="Name"
+              value={editEvent?.name || ""}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+            />
+
+            <div>
+              <p className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Description</p>
+              <textarea
+                value={editEvent?.description || ""}
+                onChange={(e) => handleInputChange("description", e.target.value)}
+                rows={5}
+                className="w-full rounded-2xl border border-cyan-500/40 bg-slate-900/60 px-4 py-3 text-sm font-medium text-slate-100 transition-all duration-300 placeholder-slate-400 focus:border-cyan-500 focus:bg-slate-900/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+              />
+            </div>
+
+            <CustomInput
+              label="Date"
+              type="date"
+              value={editEvent?.date ? new Date(editEvent.date).toISOString().slice(0, 10) : ""}
+              onChange={(e) => handleInputChange("date", e.target.value)}
+            />
+
+            <CustomInput
+              label="Location"
+              value={editEvent?.location || ""}
+              onChange={(e) => handleInputChange("location", e.target.value)}
+            />
+
+            <div className="pt-1">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-fuchsia-200">Entry Types</p>
+
+              <div className="space-y-3">
+                {editEvent?.entryTypes.map((entryType, index) => (
+                  <div
+                    key={index}
+                    className="rounded-2xl border border-white/10 bg-slate-900/30 p-3 sm:p-4"
+                  >
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-12 sm:items-end">
+                      <div className="sm:col-span-5">
+                        <p className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Name</p>
+                        <input
+                          value={entryType.name}
+                          onChange={(e) => handleEntryTypeChange(index, "name", e.target.value)}
+                          className="w-full rounded-full border border-cyan-500/40 bg-slate-900/60 px-4 py-2.5 text-sm font-medium text-slate-100 transition-all duration-300 focus:border-cyan-500 focus:bg-slate-900/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-3">
+                        <p className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Amount</p>
+                        <input
+                          type="number"
+                          value={entryType.amount}
+                          onChange={(e) => handleEntryTypeChange(index, "amount", e.target.value)}
+                          className="w-full rounded-full border border-cyan-500/40 bg-slate-900/60 px-4 py-2.5 text-sm font-medium text-slate-100 transition-all duration-300 focus:border-cyan-500 focus:bg-slate-900/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-3">
+                        <p className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Count</p>
+                        <input
+                          type="number"
+                          value={entryType.count}
+                          onChange={(e) => handleEntryTypeChange(index, "count", e.target.value)}
+                          className="w-full rounded-full border border-cyan-500/40 bg-slate-900/60 px-4 py-2.5 text-sm font-medium text-slate-100 transition-all duration-300 focus:border-cyan-500 focus:bg-slate-900/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-1">
+                        <Button
+                          onClick={() => removeEntryType(index)}
+                          className="!min-w-0 !rounded-full !border !border-red-400/60 !px-3 !py-2 !text-red-300"
+                        >
+                          <Remove />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                onClick={addEntryType}
+                className="!mt-3 !rounded-full !border !border-emerald-400/60 !bg-emerald-500/10 !px-4 !py-2 !text-emerald-200"
+              >
+                <Add /> Add Entry Type
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-8 flex gap-3">
+            <Button
+              onClick={handleEditClose}
+              className="!flex-1 !rounded-full !bg-slate-600 !px-4 !py-2.5 !text-white hover:!bg-slate-500"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleEditSave}
+              className="!flex-1 !rounded-full !bg-gradient-to-r !from-emerald-500 !to-green-600 !px-5 !py-2.5 !text-white"
+            >
+              Save
+            </Button>
+          </div>
+        </div>
       </Dialog>
 
       <Dialog
         open={bookDialogOpen}
-        maxWidth="sm"
+        maxWidth={false}
+        fullWidth
         onClose={() => setBookDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background: "linear-gradient(145deg, #0b1220 0%, #15112a 100%)",
+            color: "#fff",
+            border: "1px solid rgba(255,255,255,0.12)",
+            width: "min(540px, 92vw)",
+            maxWidth: "540px",
+          },
+        }}
       >
-        <div className="p-4 max-w-[400px]">
-        <div className="mb-6">
-        <p className="text-[30px] font-bold text-center">Book Pass</p>
-          <p className="text-[18px] font-semibold text-center">{bookEvent?.name}</p>
-          <p className="text-[14px] font-semibold text-center">
+        <div className="w-full p-10 text-white">
+        <div className="mb-8">
+        <p className="text-center text-[30px] font-extrabold tracking-tight">Book Pass</p>
+          <p className="text-center text-[18px] font-semibold text-cyan-100">{bookEvent?.name}</p>
+          <p className="text-center text-[14px] font-semibold text-slate-300">
             Location: {bookEvent?.location}
           </p>
         </div>
         {/* select entry type and count of pass  */}
-        <TextField
-          margin="dense"
-          label="Name"
-          fullWidth
-          value={bookEventDetails?.name || ""}
-          onChange={(e) => handleBookInputChange("name", e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          label="Email"
-          fullWidth
-          value={bookEventDetails?.email || ""}
-          onChange={(e) => handleBookInputChange("email", e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          label="Mobile"
-          fullWidth
-          value={bookEventDetails?.mobile || ""}
-          onChange={(e) => handleBookInputChange("mobile", e.target.value)}
-        />
-        <p className="text-xs font-semibold mt-2">Select Entry</p>
-        <Select
-          fullWidth
-          value={bookEventDetails?.selectValue || ""}
-          onChange={(e) => handleBookInputChange("selectValue", e.target.value)}
-        >
-          {bookEvent?.entryTypes.map((entryType) => (
-            <MenuItem key={entryType.name} value={entryType.name}>
-              {entryType.name} - ₹{entryType.amount}
-            </MenuItem>
-          ))}
-        </Select>
-        <DialogActions>
-          <Button color="secondary" onClick={()=>setBookDialogOpen(false)}>Cancel</Button>
-          <Button color="primary" onClick={handleBookSave} loading={loading}>
+        <div className="space-y-5">
+          <CustomInput
+            label="Name"
+            value={bookEventDetails?.name || ""}
+            onChange={(e) => handleBookInputChange("name", e.target.value)}
+          />
+          <CustomInput
+            label="Email"
+            type="email"
+            value={bookEventDetails?.email || ""}
+            onChange={(e) => handleBookInputChange("email", e.target.value)}
+          />
+          <CustomInput
+            label="Mobile"
+            type="tel"
+            value={bookEventDetails?.mobile || ""}
+            onChange={(e) => handleBookInputChange("mobile", e.target.value)}
+          />
+          <CustomSelect
+            label="Select Entry"
+            value={bookEventDetails?.selectValue || ""}
+            onChange={(e) => handleBookInputChange("selectValue", e.target.value)}
+            placeholder="Choose entry type"
+            options={
+              bookEvent?.entryTypes.map((entryType) => ({
+                value: entryType._id || entryType.name,
+                label: `${entryType.name} - ₹${entryType.amount}`,
+              })) || []
+            }
+          />
+        </div>
+        <div className="mt-8 flex gap-3">
+          <Button
+            onClick={()=>setBookDialogOpen(false)}
+            className="!rounded-full !flex-1 !bg-slate-600 !px-4 !py-2.5 !text-white hover:!bg-slate-500"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleBookSave}
+            loading={loading}
+            className="!rounded-full !flex-1 !bg-gradient-to-r !from-cyan-500 !to-sky-600 !px-4 !py-2.5 !text-white !font-semibold"
+          >
             Book
           </Button>
-        </DialogActions>
+        </div>
         </div>
       </Dialog>
 
@@ -686,6 +781,47 @@ const Dashboard = () => {
             setDigitalPassOpen(false);
             setPassDetails(null)
           }} />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={() => {
+          setDeleteConfirmOpen(false);
+          setEventToDelete(null);
+        }}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background: "linear-gradient(145deg, #0b1220 0%, #15112a 100%)",
+            color: "#fff",
+            border: "1px solid rgba(255,255,255,0.12)",
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, letterSpacing: "0.04em" }}>Delete Event</DialogTitle>
+        <DialogContent>
+          <p className="text-slate-300">Are you sure you want to delete this event? This action cannot be undone.</p>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setDeleteConfirmOpen(false);
+              setEventToDelete(null);
+            }}
+            className="!rounded-full !bg-slate-600 !px-4 !text-white hover:!bg-slate-500"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            className="!rounded-full !bg-gradient-to-r !from-red-500 !to-rose-600 !px-5 !text-white"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
