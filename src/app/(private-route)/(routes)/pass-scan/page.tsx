@@ -45,7 +45,7 @@ const PassScan = () => {
   };
 
   const fetchPassDataByBookingId = async () => {
-    const bookingId = bookingIdInput.trim();
+    const bookingId = bookingIdInput.trim().toUpperCase();
     if (!bookingId) {
       toast.error("Please enter booking ID");
       return;
@@ -66,6 +66,7 @@ const PassScan = () => {
         undefined,
         token || ""
       );
+      setBookingIdInput(bookingId);
       setPassData(response);
       setData(response._id);
       setScanPass(false);
@@ -298,7 +299,7 @@ const formatDate = (dateString: string) => {
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 value={bookingIdInput}
-                onChange={(e) => setBookingIdInput(e.target.value)}
+                onChange={(e) => setBookingIdInput(e.target.value.toUpperCase())}
                 placeholder="Enter Booking ID (e.g. EVT101)"
                 className="w-full rounded-full border border-cyan-500/40 bg-slate-900/60 px-4 py-2.5 text-sm font-medium text-slate-100 placeholder-slate-400 transition-all duration-300 focus:border-cyan-500 focus:bg-slate-900/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
               />
