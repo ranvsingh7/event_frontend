@@ -54,6 +54,7 @@ const Signup: React.FC<SignupProps> = ({ onSuccess }) => {
         <TextField
           label="Name"
           name="name"
+          autoComplete="name"
           value={formDataSignup.name}
           onChange={handleChangeSignup}
           fullWidth
@@ -62,6 +63,8 @@ const Signup: React.FC<SignupProps> = ({ onSuccess }) => {
         <TextField
           label="Email"
           name="email"
+          type="email"
+          autoComplete="email"
           value={formDataSignup.email}
           onChange={handleChangeSignup}
           fullWidth
@@ -70,6 +73,9 @@ const Signup: React.FC<SignupProps> = ({ onSuccess }) => {
         <TextField
           label="Mobile"
           name="mobile"
+          type="tel"
+          autoComplete="tel"
+          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
           value={formDataSignup.mobile}
           onChange={handleChangeSignup}
           fullWidth
@@ -79,6 +85,7 @@ const Signup: React.FC<SignupProps> = ({ onSuccess }) => {
           label="Password"
           name="password"
           type="password"
+          autoComplete="new-password"
           value={formDataSignup.password}
           onChange={handleChangeSignup}
           fullWidth

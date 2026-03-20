@@ -46,16 +46,16 @@ const Pass: React.FC<PassProps> = ({ open, passData, dialogClose, demoPass }) =>
           cacheBust: true,
           pixelRatio: 2,
           backgroundColor: "#0b1220",
-          width: node.scrollWidth,
-          height: node.scrollHeight,
+          width: node.clientWidth,
+          height: node.clientHeight,
         });
       } catch {
         const canvas = await toCanvas(node, {
           cacheBust: true,
           pixelRatio: 2,
           backgroundColor: "#0b1220",
-          width: node.scrollWidth,
-          height: node.scrollHeight,
+          width: node.clientWidth,
+          height: node.clientHeight,
         });
         dataUrl = canvas.toDataURL("image/png", 1);
       }
@@ -129,7 +129,7 @@ const Pass: React.FC<PassProps> = ({ open, passData, dialogClose, demoPass }) =>
                 className="relative mx-auto w-full max-w-[980px] min-w-[320px] overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-[#0b1220] via-[#101a2f] to-[#1a1230] text-white shadow-[0_20px_80px_rgba(0,0,0,0.65)]"
                 ref={ref}
               >
-                <div className="pointer-events-none absolute inset-0">
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
                   <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-fuchsia-500/30 blur-3xl" />
                   <div className="absolute -left-20 bottom-0 h-56 w-56 rounded-full bg-cyan-400/25 blur-3xl" />
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_38%)]" />

@@ -309,7 +309,11 @@ const Events = () => {
       />
       <CustomInput
         label="Mobile"
+        name="mobile"
         type="tel"
+        autoComplete="tel"
+        inputMode="numeric"
+        pattern="[0-9]*"
         value={bookEventDetails?.mobile || ""}
         onChange={(e) => handleBookInputChange("mobile", e.target.value)}
       />

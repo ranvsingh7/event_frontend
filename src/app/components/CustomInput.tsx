@@ -2,20 +2,28 @@ import React from "react";
 
 interface CustomInputProps {
   label?: string;
+  name?: string;
   type?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   fullWidth?: boolean;
+  autoComplete?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  pattern?: string;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
   label,
+  name,
   type = "text",
   value,
   onChange,
   placeholder,
   fullWidth = true,
+  autoComplete,
+  inputMode,
+  pattern,
 }) => {
   return (
     <div className={fullWidth ? "w-full" : ""}>
@@ -25,7 +33,11 @@ const CustomInput: React.FC<CustomInputProps> = ({
         </label>
       )}
       <input
+        name={name}
         type={type}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
+        pattern={pattern}
         value={value}
         onChange={onChange}
         placeholder={placeholder}

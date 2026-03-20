@@ -80,6 +80,9 @@ export default function Signup() {
                 <TextField
                     label="Mobile"
                     name="mobile"
+                    type="tel"
+                    autoComplete="tel"
+                    inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                     value={formData.mobile}
                     onChange={handleChange}
                     fullWidth
