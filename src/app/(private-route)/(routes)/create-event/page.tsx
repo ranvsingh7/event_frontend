@@ -161,7 +161,7 @@ const CreateEvent = () => {
                                 onChange={(e) =>
                                     setFormData((prev) => ({ ...prev, date: e.target.value }))
                                 }
-                                className="w-full min-w-0 rounded-full border border-cyan-500/40 bg-slate-900/60 px-6 py-3 pr-10 text-sm font-medium text-slate-100 [color-scheme:dark] transition-all duration-300 focus:border-cyan-500 focus:bg-slate-900/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                                className="w-full min-w-0 rounded-full border border-cyan-500/40 bg-slate-900/60 px-0 py-3 sm:px-6 text-sm font-medium text-slate-100 [color-scheme:dark] transition-all duration-300 focus:border-cyan-500 focus:bg-slate-900/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
                             />
                         </div>
 

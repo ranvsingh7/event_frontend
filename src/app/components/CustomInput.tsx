@@ -30,7 +30,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
 
   const dateClass =
     type === "date"
-      ? " pr-10 [color-scheme:dark]"
+      ? " px-0 sm:px-6 [color-scheme:dark]"
       : "";
 
   return (
