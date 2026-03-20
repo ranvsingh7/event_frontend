@@ -40,6 +40,7 @@ export interface BookEventDetails {
 
 export interface Booking extends BookEventDetails {
     _id: string;
+    bookingId?: string;
     date: string;
     entryTitle: string;
     eventDate: string;

@@ -17,6 +17,7 @@ import {
   Home,
   Logout,
   Menu as MenuIcon,
+  Public,
   QrCodeScanner,
   ReceiptLong,
 } from "@mui/icons-material";
@@ -45,6 +46,7 @@ const Navbar = () => {
     { href: "/create-event", label: "Create Event", icon: <AddCircleOutline fontSize="small" /> },
     { href: "/bookings", label: "Bookings", icon: <EventNote fontSize="small" /> },
     { href: "/pass-scan", label: "Scan Pass", icon: <QrCodeScanner fontSize="small" /> },
+    { href: "/events", label: "Explore Events", icon: <Public fontSize="small" /> },
   ];
 
   const moreLinks = [

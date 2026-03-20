@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import Link from "next/link";
 
 export default function Signin() {
   const [isLogin, setIsLogin] = useState<boolean>(true);
@@ -40,6 +41,13 @@ export default function Signin() {
       <div className="w-full max-w-md transform transition duration-300">
         {isLogin ? <Login /> : <Signup onSuccess={() => setIsLogin(true)} />}
       </div>
+
+      <Link
+        href="/events"
+        className="mt-8 inline-flex items-center justify-center rounded-full bg-pink-500 px-7 py-3.5 text-base font-bold text-white shadow-lg transition-all duration-200 hover:bg-pink-600"
+      >
+        Explore Event
+      </Link>
     </div>
   );
 }

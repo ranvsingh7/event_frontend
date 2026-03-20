@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
+import { Button, CircularProgress, Dialog, DialogContent, DialogTitle, IconButton } from "@mui/material";
 import { Booking, CustomJwtPayload } from "@/types/types";
 import { apiRequest } from "@/utils/api";
 import { jwtDecode } from "jwt-decode";
@@ -194,7 +194,12 @@ const BookingPage = () => {
 
                             <div className="relative z-10">
                                 <div className="flex items-start justify-between gap-3">
-                                    <p className="text-xl font-extrabold tracking-tight text-white">{booking.name}</p>
+                                    <p className="text-xl font-extrabold tracking-tight text-white">
+                                        {booking.name}
+                                        {booking.bookingId ? (
+                                            <span className="ml-2 text-sm font-semibold text-cyan-200">({booking.bookingId})</span>
+                                        ) : null}
+                                    </p>
                                     <Button
                                         onClick={() => setSelectedBooking(booking)}
                                         className="!min-w-0 !shrink-0 !rounded-full !border !border-cyan-400/60 !bg-cyan-500/10 !px-3 !py-1.5 !text-[10px] !font-semibold !tracking-[0.08em] !text-cyan-200"
@@ -233,13 +238,16 @@ const BookingPage = () => {
                             </div>
                         </div>
                     ))}
+
+                    {loadingMore && (
+                        <div className="sm:col-span-2 xl:col-span-3">
+                            <div className="flex items-center justify-center py-6">
+                                <CircularProgress size={56} sx={{ color: "#67e8f9" }} />
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <div ref={loadMoreRef} className="h-10 w-full" />
-                {loadingMore && (
-                    <div className="mt-2 flex w-full justify-center">
-                        <Loading loading={loadingMore} />
-                    </div>
-                )}
                 {!hasMore && bookings.length > 0 && (
                     <p className="mt-3 text-center text-xs text-slate-400">You’ve reached the end of bookings.</p>
                 )}

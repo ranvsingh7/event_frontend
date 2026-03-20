@@ -283,9 +283,22 @@ const formatDate = (dateString: string) => {
         </>
 
       ) : scanPass ? (
-        <div className="relative mx-auto w-full max-w-[420px] overflow-hidden rounded-2xl border border-white/15 bg-black/20 p-3 sm:p-4">
-          <div className="absolute left-1/2 top-1/2 z-10 h-[2px] w-[72%] -translate-x-1/2 -translate-y-1/2 bg-red-400/90"></div>
-            <Scanner onScan={(result) =>{handleResult(result)}} />
+        <div className="w-full max-w-[420px]">
+          <div className="relative mx-auto w-full overflow-hidden rounded-2xl border border-white/15 bg-black/20 p-3 sm:p-4">
+            <div className="absolute left-1/2 top-1/2 z-10 h-[2px] w-[72%] -translate-x-1/2 -translate-y-1/2 bg-red-400/90"></div>
+              <Scanner onScan={(result) =>{handleResult(result)}} />
+          </div>
+
+          <Button
+            onClick={() => {
+              setScanPass(false);
+              setError(null);
+              setData(null);
+            }}
+            className="!mt-4 !w-full !rounded-full !border !border-slate-400/60 !bg-slate-700/40 !px-5 !py-2.5 !text-xs !font-semibold !tracking-[0.08em] !text-slate-100 hover:!bg-slate-600/50"
+          >
+            Go Back
+          </Button>
         </div>
       ) : (
         <div className="w-full max-w-xl space-y-4">

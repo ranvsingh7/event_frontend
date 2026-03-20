@@ -80,7 +80,7 @@
 
 // export default PublicNav;
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -88,10 +88,21 @@ import Logo from "@/../public/new-logo.png"; // Adjust the path as necessary
 
 const PublicNav = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  useEffect(() => {
+    const hasToken = document.cookie
+      .split(";")
+      .some((cookie) => cookie.trim().startsWith("token="));
+    setIsLoggedIn(hasToken);
+  }, []);
+
+  const ctaHref = isLoggedIn ? "/dashboard" : "/auth";
+  const ctaLabel = isLoggedIn ? "Access Dashboard" : "Partner Login";
 
   return (
     <nav className="bg-indigo-600 text-white h-16 md:h-20 flex items-center justify-between px-4 md:px-8 shadow-md">
@@ -130,7 +141,7 @@ const PublicNav = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute top-16 left-0 w-full bg-indigo-600 text-white flex flex-col items-center space-y-6 py-6 px-6 shadow-md md:hidden"
+            className="absolute z-[999] top-16 left-0 w-full bg-indigo-600 text-white flex flex-col items-center space-y-6 py-6 px-6 shadow-md md:hidden"
           >
             <Link href="/" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
               Home
@@ -144,9 +155,15 @@ const PublicNav = () => {
             <Link href="/contact-us" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
               Contact
             </Link>
-            <Link href="/auth">
+            <Link href="/terms-and-condition" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
+              Terms & Condition
+            </Link>
+            <Link href="/refund-and-cancellation" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
+              Refund & Cancellation
+            </Link>
+            <Link href={ctaHref}>
               <button className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-md shadow-md transition duration-300">
-                Partner Login
+                {ctaLabel}
               </button>
             </Link>
           </motion.div>
@@ -167,13 +184,19 @@ const PublicNav = () => {
         <Link href="/contact-us" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
           Contact
         </Link>
+        <Link href="/terms-and-condition" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
+          Terms & Condition
+        </Link>
+        <Link href="/refund-and-cancellation" className="text-lg font-medium hover:text-yellow-300 transition duration-200">
+          Refund & Cancellation
+        </Link>
       </div>
 
       {/* Call-to-Action Button */}
       <div className="hidden md:block">
-        <Link href="/auth">
+        <Link href={ctaHref}>
           <button className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-md shadow-md transition duration-300">
-            Partner Login
+            {ctaLabel}
           </button>
         </Link>
       </div>

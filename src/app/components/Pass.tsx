@@ -3,7 +3,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import { Button, Dialog, DialogContent, IconButton, Typography } from "@mui/material";
 import { toCanvas, toPng } from "html-to-image";
-import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -24,6 +23,7 @@ const Pass: React.FC<PassProps> = ({ open, passData, dialogClose, demoPass }) =>
     setDigitalPassOpen(open);
     setPassDetails(passData);
   }, [open, passData]);
+  console.log(passDetails)
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -113,11 +113,12 @@ const Pass: React.FC<PassProps> = ({ open, passData, dialogClose, demoPass }) =>
         },
       }}
     >
-      <DialogContent className="relative overflow-x-auto bg-[#060a15] p-3 sm:p-6">
+      <DialogContent className="relative overflow-x-auto bg-[#060a15] p-3 pt-12 sm:p-6 sm:pt-6">
         <IconButton
           onClick={handleClose}
           aria-label="close"
-          className="!absolute right-3 top-3 z-20 !text-white/85 hover:!text-white"
+          className="!absolute !right-2 !top-2 z-30 !border !border-white/20 !bg-slate-900/70 !text-white/90 !backdrop-blur-sm hover:!bg-slate-800/80 hover:!text-white sm:!right-3 sm:!top-3"
+          size="small"
         >
           <CloseIcon />
         </IconButton>
@@ -149,7 +150,7 @@ const Pass: React.FC<PassProps> = ({ open, passData, dialogClose, demoPass }) =>
                       </p>
                     </div>
 
-                    <div className="rounded-xl border border-white/20 bg-black/25 p-3 backdrop-blur-sm">
+                    {/* <div className="rounded-xl border border-white/20 bg-black/25 p-3 backdrop-blur-sm">
                       <Image
                         src="/logo/logo.png"
                         alt="Logo"
@@ -159,7 +160,7 @@ const Pass: React.FC<PassProps> = ({ open, passData, dialogClose, demoPass }) =>
                         unoptimized
                         priority
                       />
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -201,7 +202,7 @@ const Pass: React.FC<PassProps> = ({ open, passData, dialogClose, demoPass }) =>
                     <div>
                       <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Venue</p>
                       <p className="mt-1 text-base font-semibold text-white sm:text-lg">
-                        {passDetails?.location || "Main Arena"}
+                        {passDetails?.location || passDetails?.eventId?.location || "Main Arena"}
                       </p>
                     </div>
                   </div>
