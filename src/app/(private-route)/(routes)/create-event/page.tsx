@@ -152,16 +152,13 @@ const CreateEvent = () => {
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="min-w-0">
-                            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-                                Event Date
-                            </label>
-                            <input
+                            <CustomInput
+                                label="Event Date"
                                 type="date"
                                 value={formData.date}
                                 onChange={(e) =>
                                     setFormData((prev) => ({ ...prev, date: e.target.value }))
                                 }
-                                className="w-full min-w-0 rounded-full border border-cyan-500/40 bg-slate-900/60 px-0 py-3 sm:px-6 text-sm font-medium text-slate-100 [color-scheme:dark] transition-all duration-300 focus:border-cyan-500 focus:bg-slate-900/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
                             />
                         </div>
 
